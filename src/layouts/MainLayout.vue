@@ -1,102 +1,133 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
+  <q-layout view="hHh lpR fFf">
+    <q-header elevated class="bg-primary text-white">
       <q-toolbar>
-        <q-btn
-          flat
-          dense
-          round
-          icon="menu"
-          aria-label="Menu"
-          @click="toggleLeftDrawer"
-        />
-
+        <q-btn dense flat round icon="menu" @click="toggleLeftDrawer" />
         <q-toolbar-title>
-          Quasar App
+          <q-avatar>
+            <img src="https://cdn.quasar.dev/logo-v2/svg/logo-mono-white.svg" />
+          </q-avatar>
+          Prototipo
         </q-toolbar-title>
-
-        <div>Quasar v{{ $q.version }}</div>
+        <q-btn flat dense icon="logout" @click="logout" to="/login" />
       </q-toolbar>
     </q-header>
 
-    <q-drawer
-      v-model="leftDrawerOpen"
-      show-if-above
-      bordered
-    >
+    <q-drawer show-if-above v-model="leftDrawerOpen" side="left" bordered style="margin-top: 73px">
       <q-list>
-        <q-item-label
-          header
-        >
-          Essential Links
-        </q-item-label>
+        <q-item-section>
+          <q-btn color="primary" push to="/" no-caps class="q-ml-md q-mr-md">
+            <q-icon name="dashboard" class="custom-icon" />
+            <span class="custom-label">Dashboard</span>
+          </q-btn>
+        </q-item-section>
 
-        <EssentialLink
-          v-for="link in linksList"
-          :key="link.title"
-          v-bind="link"
-        />
+        <q-item>
+          <q-item-section>
+            <q-btn-dropdown
+              color="primary"
+              label="Formularios"
+              icon="list_alt"
+              push
+              no-caps
+              @click="onMainClick"
+            >
+              <q-list>
+                <q-item
+                  v-for="form in formularios"
+                  :key="form.ruta"
+                  clickable
+                  v-close-popup
+                  @click="goTo(form.ruta)"
+                >
+                  <q-item-section avatar>
+                    <q-avatar>
+                      <q-icon :name="form.icono" color="primary" />
+                    </q-avatar>
+                  </q-item-section>
+                  <q-item-section>
+                    <q-item-label>{{ form.titulo }}</q-item-label>
+                    <q-item-label caption>{{ form.descripcion }}</q-item-label>
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </q-btn-dropdown>
+          </q-item-section>
+        </q-item>
       </q-list>
     </q-drawer>
 
     <q-page-container>
       <router-view />
     </q-page-container>
+
+    <q-footer elevated class="bg-grey-8 text-white">
+      <q-toolbar>
+        <q-toolbar-title>
+          <q-avatar>
+            <img src="https://cdn.quasar.dev/logo-v2/svg/logo-mono-white.svg" />
+          </q-avatar>
+          <div>Prototipo</div>
+        </q-toolbar-title>
+      </q-toolbar>
+    </q-footer>
   </q-layout>
 </template>
 
 <script setup>
 import { ref } from 'vue'
-import EssentialLink from 'components/EssentialLink.vue'
+import { useRouter } from 'vue-router'
 
-const linksList = [
-  {
-    title: 'Docs',
-    caption: 'quasar.dev',
-    icon: 'school',
-    link: 'https://quasar.dev'
-  },
-  {
-    title: 'Github',
-    caption: 'github.com/quasarframework',
-    icon: 'code',
-    link: 'https://github.com/quasarframework'
-  },
-  {
-    title: 'Discord Chat Channel',
-    caption: 'chat.quasar.dev',
-    icon: 'chat',
-    link: 'https://chat.quasar.dev'
-  },
-  {
-    title: 'Forum',
-    caption: 'forum.quasar.dev',
-    icon: 'record_voice_over',
-    link: 'https://forum.quasar.dev'
-  },
-  {
-    title: 'Twitter',
-    caption: '@quasarframework',
-    icon: 'rss_feed',
-    link: 'https://twitter.quasar.dev'
-  },
-  {
-    title: 'Facebook',
-    caption: '@QuasarFramework',
-    icon: 'public',
-    link: 'https://facebook.quasar.dev'
-  },
-  {
-    title: 'Quasar Awesome',
-    caption: 'Community Quasar projects',
-    icon: 'favorite',
-    link: 'https://awesome.quasar.dev'
-  }
-]
-
+const router = useRouter()
 const leftDrawerOpen = ref(false)
 
-function toggleLeftDrawer () {
+const formularios = [
+  {
+    titulo: 'FireOnly',
+    descripcion: 'Evaluación de riesgos por incendio',
+    icono: 'whatshot',
+    ruta: '/FireOnly',
+  },
+  {
+    titulo: 'Fire All Extended',
+    descripcion: 'Plan de acción ante emergencias',
+    icono: 'directions_run',
+    ruta: '/evacuacion',
+  },
+  {
+    titulo: 'Smart Cas',
+    descripcion: 'Inspección eléctrica',
+    icono: 'bolt',
+    ruta: '/electronico',
+  },
+  {
+    titulo: 'Smart Economy Cas',
+    descripcion: 'Registro de simulacros',
+    icono: 'event',
+    ruta: '/simulacros',
+  },
+]
+
+function goTo(ruta) {
+  router.push(ruta)
+}
+
+function toggleLeftDrawer() {
   leftDrawerOpen.value = !leftDrawerOpen.value
 }
+
+function logout() {
+  router.push('/login')
+  console.log(logout, 'holaaaa')
+}
 </script>
+
+<style>
+.custom-icon {
+  margin-right: 10px;
+}
+
+.custom-label {
+  margin-right: 40px;
+}
+</style>
