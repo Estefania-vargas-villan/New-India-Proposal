@@ -36,7 +36,7 @@ export default defineConfig((ctx) => {
     browser: ['es2022', 'firefox115', 'chrome115', 'safari14'],
     node: 'node20'
   },
-  publicPath: '/Prototipo/',
+publicPath: '/New-India-Proposal/',
 
       vueRouterMode: 'hash', // available values: 'hash', 'history'
       // vueRouterBase,
