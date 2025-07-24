@@ -26,19 +26,19 @@ const routes = [
     children: [{ path: '', component: () => import('../pages/forms/FireOnly/FireOnly.vue') }],
   },
   {
-    path: '/evacuacion',
+    path: '/FireAll',
     component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', component: () => import('../pages/EvacuacionPage.vue') }],
+    children: [{ path: '', component: () => import('../pages/forms/FireAllExtended/FireAllExtended.vue') }],
   },
   {
-    path: '/electronico',
+    path: '/SmartCas',
     component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', component: () => import('../pages/RiesgoElectronicoPage.vue') }],
+    children: [{ path: '', component: () => import('../pages/forms/SmartCas/SmartCas.vue' ) }],
   },
   {
-    path: '/simulacros',
+    path: '/SmartEconomyCas',
     component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', component: () => import('../pages/SimulacrosPage.vue') }],
+    children: [{ path: '', component: () => import('../pages/forms/SmartEconomyCas/SmartEconomyCas.vue') }],
   },
 
   {

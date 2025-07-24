@@ -38,7 +38,6 @@
             />
           </div>
 
-          <!-- Roof -->
           <div>
             <q-select
               filled
@@ -121,6 +120,7 @@ const form = reactive({
   floor: '',
   floorOther: ''
 });
+
 
 const storeysOptions = ['1', '2', '3', '4', '5+'];
 const externalWallsOptions = ['Concrete', 'Densglass', 'Wooden Structure', 'Other'];

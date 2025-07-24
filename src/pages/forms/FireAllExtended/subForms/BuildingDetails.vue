@@ -8,6 +8,7 @@
     <q-card>
       <q-card-section>
         <q-form class="q-gutter-md">
+          <!-- Number of storeys -->
           <q-select
             filled
             v-model="form.storeys"
@@ -17,6 +18,7 @@
             standout
           />
 
+          <!-- External Walls -->
           <div>
             <q-select
               filled
@@ -60,6 +62,7 @@
             />
           </div>
 
+          <!-- Ceiling -->
           <div>
             <q-select
               filled
@@ -81,6 +84,7 @@
             />
           </div>
 
+          <!-- Floor -->
           <div>
             <q-select
               filled
@@ -110,6 +114,7 @@
 <script setup>
 import { reactive } from 'vue';
 
+// Form data
 const form = reactive({
   storeys: '',
   externalWalls: '',
@@ -122,12 +127,14 @@ const form = reactive({
   floorOther: ''
 });
 
+// Options
 const storeysOptions = ['1', '2', '3', '4', '5+'];
 const externalWallsOptions = ['Concrete', 'Densglass', 'Wooden Structure', 'Other'];
 const roofOptions = ['Roof Tiles', 'Shingles', 'Eterniet', 'Aluminium', 'concrete', 'Other'];
 const ceilingOptions = ['Gypsum Board', 'Wooden Structure', 'PVC/Tiles (schrootjes)', 'Other'];
 const floorOptions = ['Ceramic Tiles', 'Carpet', 'Wooden Deck', 'Rubberoid Tiles (linolium)', 'Other'];
 
+// Handlers para limpiar campos "Other" cuando no son necesarios
 const handleExternalWallsChange = (val) => {
   if (val !== 'Other') form.externalWallsOther = '';
 };
@@ -141,6 +148,7 @@ const handleFloorChange = (val) => {
   if (val !== 'Other') form.floorOther = '';
 };
 
+// Exponer datos y métodos al componente padre
 defineExpose({
   formData: form,
   resetForm: () => {

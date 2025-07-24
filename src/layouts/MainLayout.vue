@@ -5,9 +5,9 @@
         <q-btn dense flat round icon="menu" @click="toggleLeftDrawer" />
         <q-toolbar-title>
           <q-avatar>
-            <img src="https://cdn.quasar.dev/logo-v2/svg/logo-mono-white.svg" />
+            <img src="../assets/NewIndia.png" />
           </q-avatar>
-          Prototipo
+          New India
         </q-toolbar-title>
         <q-btn flat dense icon="logout" @click="logout" to="/login" />
       </q-toolbar>
@@ -61,13 +61,14 @@
       <router-view />
     </q-page-container>
 
-    <q-footer elevated class="bg-grey-8 text-white">
+    <q-footer elevated class="  bg-grey-8 text-white">
       <q-toolbar>
-        <q-toolbar-title>
+        <q-toolbar-title style="display:flex; align-items: center;
+    justify-content: center; ">
           <q-avatar>
-            <img src="https://cdn.quasar.dev/logo-v2/svg/logo-mono-white.svg" />
+            <img src="../assets/NewIndia.png" />
           </q-avatar>
-          <div>Prototipo</div>
+          <div>New India</div>
         </q-toolbar-title>
       </q-toolbar>
     </q-footer>
@@ -92,19 +93,19 @@ const formularios = [
     titulo: 'Fire All Extended',
     descripcion: 'Plan de acción ante emergencias',
     icono: 'directions_run',
-    ruta: '/evacuacion',
+    ruta: '/FireAll',
   },
   {
     titulo: 'Smart Cas',
     descripcion: 'Inspección eléctrica',
     icono: 'bolt',
-    ruta: '/electronico',
+    ruta: '/SmartCas',
   },
   {
     titulo: 'Smart Economy Cas',
     descripcion: 'Registro de simulacros',
     icono: 'event',
-    ruta: '/simulacros',
+    ruta: '/SmartEconomyCas',
   },
 ]
 

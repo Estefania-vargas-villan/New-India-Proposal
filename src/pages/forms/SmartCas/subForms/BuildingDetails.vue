@@ -38,7 +38,6 @@
             />
           </div>
 
-          <!-- Roof -->
           <div>
             <q-select
               filled

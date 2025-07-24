@@ -1,7 +1,7 @@
 <template>
   <q-page class="q-pa-md">
     <div class="q-mb-lg">
-      <h1 class="text-h4 text-primary q-mb-sm text-center">FIRE ONLY</h1>
+      <h1 class="text-h4 text-primary q-mb-sm text-center">SMART ECONOMY CAS<canvas id=""></canvas></h1>
       <q-card flat bordered class="bg-grey-1">
         <q-card-section>
           <p class="text-body1 text-center">
@@ -22,9 +22,9 @@
           <GeneralInformation ref="generalInfoForm" />
         </q-card-section>
       </q-card>
-      <q-card flat bordered class="q-mb-md">
+    <q-card flat bordered class="q-mb-md">
         <q-card-section>
-          <ProposerInformation ref="proposerInfoForm" />
+    <ProposerInformation ref="proposerInfoForm" />
         </q-card-section>
       </q-card>
       <q-card flat bordered class="q-mb-md">
@@ -32,16 +32,19 @@
           <BuildingConstruction ref="buildingConstructionForm" />
         </q-card-section>
       </q-card>
+
       <q-card flat bordered class="q-mb-md">
         <q-card-section>
           <CoverRequired ref="coverRequiredForm" />
         </q-card-section>
       </q-card>
+
       <q-card flat bordered class="q-mb-md">
         <q-card-section>
           <InsuranceAmounts ref="insuranceAmountsForm" />
         </q-card-section>
       </q-card>
+
       <q-card flat bordered class="q-mb-md">
         <q-card-section>
           <Summary ref="summaryRef" :form-data="combinedFormData" :reset-trigger="resetFlag" />
@@ -150,19 +153,22 @@ import { useQuasar } from 'quasar'
 
 const $q = useQuasar()
 
+// Refs
 const summaryRef = ref(null)
-const proposerInfoForm = ref(null)
+const proposerInfoForm = ref(null);
 const generalInfoForm = ref(null)
 const buildingConstructionForm = ref(null)
 const coverRequiredForm = ref(null)
 const insuranceAmountsForm = ref(null)
 
+// State
 const premiumCalculation = ref(null)
 const formSubmitted = ref(false)
 const submitting = ref(false)
 const calculating = ref(false)
 const resetFlag = ref(false)
 
+// Computed
 const combinedFormData = computed(() => ({
   ...generalInfoForm.value?.formData,
   ...proposerInfoForm.value?.formData,
@@ -172,15 +178,15 @@ const combinedFormData = computed(() => ({
 }))
 
 const isReadyForCalculation = computed(() => {
-  const data = insuranceAmountsForm.value?.formData
-  return (data?.buildingItems?.length > 0 && Object.keys(data?.buildingAmounts || {}).length > 0) || 
-         (data?.generalContentsItems?.length > 0 && Object.keys(data?.generalContentsAmounts || {}).length > 0)
+  return insuranceAmountsForm.value?.formData?.buildingItems?.length > 0 || 
+         insuranceAmountsForm.value?.formData?.generalContentsItems?.length > 0
 })
 
 const discountApplied = computed(() => {
   return premiumCalculation.value?.discountApplied || false
 })
 
+// Methods
 const formatCurrency = (value) => {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
@@ -193,28 +199,22 @@ const calculatePremium = async () => {
   calculating.value = true
   
   try {
+    // First validate all forms
     if (!validateFormsBeforeCalculation()) {
       return
     }
 
     const amountsData = insuranceAmountsForm.value?.formData
-    if (!amountsData) {
-      showNotification('negative', 'No insurance data', 'Please fill in the insurance amounts', 'error')
-      return
-    }
-
-    console.log('Datos para cálculo:', amountsData) // Debug
+    if (!amountsData) return
 
     const items = []
     let totalSumInsured = 0
     let totalPremium = 0
 
+    // Calculate building insurance
     if (amountsData.buildingItems?.length > 0) {
-      const buildingSum = amountsData.buildingItems.reduce((sum, item) => {
-        const amount = Number(amountsData.buildingAmounts[item]) || 0
-        return sum + amount
-      }, 0)
-
+      const buildingSum = Object.values(amountsData.buildingAmounts || {}).reduce(
+        (sum, val) => sum + (Number(val) || 0), 0)
       if (buildingSum > 0) {
         const buildingPremium = (buildingSum / 1000) * 2.5
         items.push({
@@ -228,12 +228,10 @@ const calculatePremium = async () => {
       }
     }
 
+    // Calculate contents insurance
     if (amountsData.generalContentsItems?.length > 0) {
-      const contentsSum = amountsData.generalContentsItems.reduce((sum, item) => {
-        const amount = Number(amountsData.generalContentsAmounts[item]) || 0
-        return sum + amount
-      }, 0)
-
+      const contentsSum = Object.values(amountsData.generalContentsAmounts || {}).reduce(
+        (sum, val) => sum + (Number(val) || 0), 0)
       if (contentsSum > 0) {
         const contentsPremium = (contentsSum / 1000) * 5.5
         items.push({
@@ -247,11 +245,7 @@ const calculatePremium = async () => {
       }
     }
 
-    if (items.length === 0) {
-      showNotification('warning', 'No items to insure', 'Please select at least one item to insure', 'warning')
-      return
-    }
-
+    // Apply discount if applicable
     let discountAmount = 0
     let finalPremium = totalPremium
     const shouldApplyDiscount = totalPremium > 1000
@@ -260,11 +254,6 @@ const calculatePremium = async () => {
       discountAmount = totalPremium * 0.1
       finalPremium = totalPremium - discountAmount
     }
-
-    const policyFee = 50
-    const taxes = finalPremium * 0.07
-    const totalAdditionalCharges = policyFee + taxes
-    finalPremium += totalAdditionalCharges
 
     premiumCalculation.value = {
       items,
@@ -276,16 +265,16 @@ const calculatePremium = async () => {
       additionalCharges: [
         {
           description: 'Policy Fee',
-          amount: policyFee
+          amount: 50
         },
         {
           description: 'Taxes',
-          amount: taxes
+          amount: finalPremium * 0.07
         }
       ]
     }
 
-    showNotification('positive', 'Premium calculated successfully', `Total premium: ${formatCurrency(finalPremium)}`, 'calculate')
+    showNotification('positive', 'Premium calculated successfully', '', 'calculate')
     
   } catch (error) {
     console.error('Calculation error:', error)
@@ -298,7 +287,7 @@ const calculatePremium = async () => {
 const validateFormsBeforeCalculation = () => {
   const forms = [
     generalInfoForm.value,
-    proposerInfoForm.value,
+      proposerInfoForm.value, 
     buildingConstructionForm.value,
     coverRequiredForm.value,
     insuranceAmountsForm.value
@@ -310,8 +299,7 @@ const validateFormsBeforeCalculation = () => {
   forms.forEach(form => {
     if (!form?.validate?.()) {
       isValid = false
-      const sectionName = form.$el?.querySelector('.q-expansion-item__title')?.textContent || 'Unknown section'
-      invalidSections.push(sectionName)
+      invalidSections.push(form.$el.querySelector('.q-expansion-item__title')?.textContent || 'Unknown section')
     }
   })
 
@@ -327,7 +315,7 @@ const validateFormsBeforeCalculation = () => {
 const validateForm = () => {
   const forms = [
     { ref: generalInfoForm, name: 'General Information' },
-    { ref: proposerInfoForm, name: 'Proposer Information' },
+       { ref: proposerInfoForm, name: 'Proposer Information' },
     { ref: buildingConstructionForm, name: 'Building Construction' },
     { ref: coverRequiredForm, name: 'Cover Required' },
     { ref: insuranceAmountsForm, name: 'Insurance Amounts' }
@@ -353,11 +341,13 @@ const validateForm = () => {
 }
 
 const submitForm = async () => {
+  // Validate premium calculation
   if (!premiumCalculation.value) {
     showNotification('warning', 'Premium not calculated', 'Please calculate premium before submitting', 'warning')
     return
   }
 
+  // Validate form completeness
   if (!validateForm()) {
     return
   }
@@ -367,16 +357,18 @@ const submitForm = async () => {
   try {
     const formData = {
       generalInfo: generalInfoForm.value?.formData,
-      proposerInfo: proposerInfoForm.value?.formData,
+         proposerInfo: proposerInfoForm.value?.formData, 
       buildingConstruction: buildingConstructionForm.value?.formData,
       coverRequired: coverRequiredForm.value?.formData,
       insuranceAmounts: insuranceAmountsForm.value?.formData,
       premiumCalculation: premiumCalculation.value
     }
 
+    // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1500))
     console.log('Form submission data:', formData)
     
+    // Show success
     showNotification('positive', 'Request submitted successfully', 
       `Your reference number is #${Math.floor(1000 + Math.random() * 9000)}`, 
       'check_circle')
@@ -395,7 +387,7 @@ const submitForm = async () => {
 
 const resetForm = () => {
   generalInfoForm.value?.resetForm()
-  proposerInfoForm.value?.resetForm()
+    proposerInfoForm.value?.resetForm()
   buildingConstructionForm.value?.resetForm()
   coverRequiredForm.value?.resetForm()
   insuranceAmountsForm.value?.resetForm()
