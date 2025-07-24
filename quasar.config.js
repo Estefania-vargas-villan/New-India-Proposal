@@ -31,12 +31,12 @@ export default defineConfig((ctx) => {
       'material-icons', // optional, you are not bound to it
     ],
 
-    // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#build
     build: {
-      target: {
-        browser: ['es2022', 'firefox115', 'chrome115', 'safari14'],
-        node: 'node20',
-      },
+  target: {
+    browser: ['es2022', 'firefox115', 'chrome115', 'safari14'],
+    node: 'node20'
+  },
+  publicPath: '/Prototipo/',
 
       vueRouterMode: 'hash', // available values: 'hash', 'history'
       // vueRouterBase,

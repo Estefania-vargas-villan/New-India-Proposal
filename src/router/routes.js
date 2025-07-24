@@ -15,11 +15,7 @@ const routes = [
     component: () => import('layouts/MainLayout.vue'),
     children: [{ path: '', component: () => import('../pages/DashboardPage.vue') }],
   },
-  {
-    path: '/forms',
-    component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', component: () => import('../pages/Forms.vue') }],
-  },
+  
   {
     path: '/FireOnly',
     component: () => import('layouts/MainLayout.vue'),
