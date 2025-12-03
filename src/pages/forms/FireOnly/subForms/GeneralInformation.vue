@@ -1,242 +1,739 @@
 <template>
-  <q-expansion-item
-    group="form-sections"
-    icon="info"
-    label="General Information"
-    header-class="text-primary text-weight-bold"
- 
-  >
-    <q-card>
-      <q-card-section>
-        <q-form class="q-gutter-md">
-          <div class="broker">
-            <q-select
-              filled
-              v-model="form.broker"
-              :options="brokerOptions"
-              label="Select broker"
-              dense
-              standout
-              class="full-width"
-            />
+  <div class="step1-container">
+    <!-- Cliente Existente o Nuevo -->
+    <div class="q-mb-md">
+      <div class="text-subtitle2 q-mb-sm">1a) Existing Customer? *</div>
+      <div class="row q-col-gutter-md">
+        <div class="col-12 col-md-6">
+          <q-radio 
+            v-model="existingCustomer" 
+            val="yes" 
+            label="Yes"
+            @update:model-value="handleExistingCustomerChange"
+          />
+        </div>
+        <div class="col-12 col-md-6">
+          <q-radio 
+            v-model="existingCustomer" 
+            val="no" 
+            label="No"
+            @update:model-value="handleExistingCustomerChange"
+          />
+        </div>
+      </div>
+    </div>
 
-            <q-select
-              filled
-              v-model="form.accCode"
-              :options="accCodeOptions"
-              label="Select acc. Code"
-              dense
-              standout
-              class="full-width"
-            />
+    <!-- Select Customer (solo si existingCustomer = 'yes') -->
+    <div v-if="existingCustomer === 'yes'" class="q-mb-md">
+      <div class="text-subtitle2 q-mb-sm">Select Existing Customer *</div>
+      <q-select ref="customerSelectRef" v-model="selectedCustomer" :options="filteredCustomers"
+        label="Type customer name to search" use-input outlined emit-value map-options option-label="fullName"
+        option-value="id" @filter="filterCustomers" @update:model-value="handleCustomerSelect"
+        @clear="handleClearCustomer" clearable :rules="existingCustomer === 'yes' ? [val => !!val || 'Customer selection is required'] : []">
+        <template v-slot:option="scope">
+          <q-item v-bind="scope.itemProps">
+            <q-item-section>
+              <q-item-label>{{ scope.opt.fullName }}</q-item-label>
+              <q-item-label caption>{{ scope.opt.code }} - {{ scope.opt.email }}</q-item-label>
+            </q-item-section>
+          </q-item>
+        </template>
+        <template v-slot:no-option>
+          <q-item>
+            <q-item-section class="text-grey">
+              No customers found
+            </q-item-section>
+          </q-item>
+        </template>
+      </q-select>
+    </div>
+
+    <!-- Create New Customer (solo si existingCustomer = 'no') -->
+    <div v-if="existingCustomer === 'no'" class="q-mb-md">
+      <q-card class="q-mt-md bg-blue-1">
+        <q-card-section>
+          <div class="text-subtitle2 q-mb-sm">Create New Customer</div>
+          <div class="text-caption text-grey q-mb-sm">
+            Customer ID will be auto-generated upon creation
           </div>
-
-          <div class="q-pa-sm">
-            <p class="text-h6 q-mb-md">Policy Period</p>
-            <div class="row q-gutter-md q-mb-md">
-              <div class="col">
-                <q-select
-                  filled
-                  v-model="form.policyMonths"
-                  :options="policyMonthsOptions"
-                  label="Months"
-                  dense
-                  standout
-                  class="full-width"
-                />
+          
+          <q-form @submit="createNewCustomer" class="q-gutter-md">
+            <!-- Campos existentes -->
+            <q-input v-model="newCustomer.fullName" label="Name of proposer (in full) *" outlined
+              :rules="[val => !!val || 'Full name is required']" />
+            <q-input v-model="newCustomer.fullMailingAddress" label="Full mailing address *" outlined type="textarea" rows="2"
+              :rules="[val => !!val || 'Mailing address is required']" />
+            
+            <div class="row q-col-gutter-md">
+              <div class="col-12 col-md-6">
+                <q-input v-model="newCustomer.homeOrWorkTel" label="Home/Work Tel # *" outlined
+                  :rules="[val => !!val || 'Phone is required']" />
               </div>
-
-              <div class="col">
-                <q-input
-                  filled
-                  v-model="form.policyStartDate"
-                  label="Date from"
-                  dense
-                  standout
-                  type="date"
-                  class="full-width"
-                />
-              </div>
-
-              <div class="col">
-                <q-input
-                  filled
-                  v-model="form.policyEndDate"
-                  label="Until 23:59:59 date"
-                  dense
-                  standout
-                  type="date"
-                  :min="form.policyStartDate"
-                  class="full-width"
-                  readonly
-                />
+              <div class="col-12 col-md-6">
+                <q-input v-model="newCustomer.cellMobile" label="Cell/Mobile # *" outlined
+                  :rules="[val => !!val || 'Mobile number is required']" />
               </div>
             </div>
 
-            <div class="q-pa-sm">
-              <p class="q-mb-sm text-weight-medium">
-                Are you insuring as owner or tenant of the property?
-              </p>
-              <div class="q-pa-sm bg-grey-2 rounded-borders">
-                <q-radio 
-                  v-model="form.propertyRelationship" 
-                  val="owner" 
-                  label="Owner" 
-                />
-                <q-radio 
-                  v-model="form.propertyRelationship" 
-                  val="tenant" 
-                  label="Tenant" 
-                />
+            <q-input v-model="newCustomer.email" label="Email *" outlined type="email"
+              :rules="[val => !!val || 'Email is required']" />
+            
+            <div class="row q-col-gutter-md">
+              <div class="col-12 col-md-6">
+                <q-input v-model="newCustomer.persoonsNumber" label="Persoons #" outlined />
+              </div>
+              <div class="col-12 col-md-6">
+                <q-input v-model="newCustomer.businessProfession" label="Proposer's Business or Profession *" outlined
+                  :rules="[val => !!val || 'Business/Profession is required']" />
               </div>
             </div>
 
-            <div class="q-pa-sm">
-              <p class="q-mb-sm text-weight-medium">Residence Type:</p>
+            <div class="insurance-period-section q-mt-lg">
+              <div class="text-subtitle2 q-mb-sm">Period of Insurance</div>
+              <div class="text-caption text-grey q-mb-sm">
+                (Which cannot be before the proposal is accepted by the company)
+              </div>
               
-              <div v-if="form.propertyRelationship === 'tenant'">
-                <q-input
-                  filled
-                  value="Residence Only"
-                  label="Residence Only"
-                  dense
-                  standout
-                  class="full-width"
-                  readonly
-                />
-              </div>
-
-              <div v-else>
-                <q-option-group
-                  v-model="form.residenceType"
-                  :options="residenceTypeOptions"
-                  type="radio"
-                  class="q-mt-sm"
-                />
-
-                <div v-if="form.residenceType === 'Residence & Commercial Activity'" class="q-mt-md">
-                  <q-select
-                    filled
-                    v-model="form.commercialActivityType"
-                    :options="commercialActivityOptions"
-                    label="Select Commercial Activity Type"
-                    dense
-                    standout
-                    class="full-width"
-                  />
-
-                  <q-input
-                    v-if="form.commercialActivityType === 'Other (please specify)'"
-                    v-model="form.otherCommercialActivity"
-                    label="Please specify commercial activity"
-                    dense
-                    filled
-                    class="q-mt-sm full-width"
-                  />
+              <div class="row q-col-gutter-md">
+                <div class="col-12 col-md-4">
+                  <q-select v-model="newCustomer.insurancePeriodMonths" :options="insurancePeriodOptions" 
+                    label="Months *" outlined emit-value map-options
+                    :rules="[val => !!val || 'Insurance period is required']" />
+                </div>
+                <div class="col-12 col-md-4">
+                  <q-input v-model="newCustomer.insuranceDateFrom" label="Date From *" outlined
+                    :rules="[val => !!val || 'Start date is required']">
+                    <template v-slot:append>
+                      <q-icon name="event" class="cursor-pointer">
+                        <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                          <q-date v-model="newCustomer.insuranceDateFrom" mask="YYYY-MM-DD">
+                            <div class="row items-center justify-end">
+                              <q-btn v-close-popup label="Close" color="primary" flat />
+                            </div>
+                          </q-date>
+                        </q-popup-proxy>
+                      </q-icon>
+                    </template>
+                  </q-input>
+                </div>
+                <div class="col-12 col-md-4">
+                  <q-input v-model="newCustomer.insuranceDateUntil" label="Until 23:59:59 *" outlined
+                    :rules="[val => !!val || 'End date is required']">
+                    <template v-slot:append>
+                      <q-icon name="event" class="cursor-pointer">
+                        <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                          <q-date v-model="newCustomer.insuranceDateUntil" mask="YYYY-MM-DD">
+                            <div class="row items-center justify-end">
+                              <q-btn v-close-popup label="Close" color="primary" flat />
+                            </div>
+                          </q-date>
+                        </q-popup-proxy>
+                      </q-icon>
+                    </template>
+                  </q-input>
                 </div>
               </div>
             </div>
 
-            <div class="q-mt-lg">
-              <p class="text-h6 q-mb-md ">What do you want to cover?</p>
-              <q-option-group
-                v-model="form.homeOption"
-                :options="coverageOptions"
-                type="radio"
-                class="q-mt-sm flex bg-grey-2"
-              />
+            <div class="premises-section q-mt-lg">
+              <div class="text-subtitle2 q-mb-sm">Location of Premises Proposed for Insurance</div>
+              <div class="text-caption text-grey q-mb-sm">
+                (Any change of location after the proposal is submitted, must be brought to the notice of the insurance company immediately)
+              </div>
+              
+              <q-input v-model="newCustomer.premisesSituation" label="Situation *" outlined type="textarea" rows="3"
+                hint="Give full address, i.e. name of building, street, town, etc"
+                :rules="[val => !!val || 'Premises situation is required']" />
             </div>
+
+            <div class="row q-gutter-sm">
+              <q-btn label="Save Customer" color="primary" type="submit" :loading="savingCustomer" />
+            </div>
+          </q-form>
+        </q-card-section>
+      </q-card>
+    </div>
+
+    <!-- Broker Selection -->
+    <div class="q-mb-md">
+      <div class="text-subtitle2 q-mb-sm">1b) Select Broker *</div>
+      <q-select v-model="selectedBroker" :options="brokerOptions" label="Select broker" outlined emit-value map-options
+        option-label="label" option-value="value" :rules="[val => !!val || 'Broker selection is required']" />
+    </div>
+
+    <!-- Account Code -->
+    <div class="q-mb-md">
+      <div class="text-subtitle2 q-mb-sm">1c) Select On Account Code (if applicable)</div>
+      <q-select v-model="selectedAccountCode" :options="accountCodeOptions" label="Select account code" outlined
+        emit-value map-options option-label="label" option-value="value"
+        @update:model-value="handleAccountCodeChange" />
+    </div>
+
+    <!-- ============================================= -->
+    <!-- Policy Period (PRIMERO) -->
+    <!-- ============================================= -->
+    <div class="q-mb-md">
+      <div class="text-subtitle2 q-mb-sm">1d) Policy Period *</div>
+      
+      <!-- Radios para Policy Period -->
+      <div class="row q-col-gutter-md q-mb-md">
+        <div class="col-12 col-md-4">
+          <q-radio 
+            v-model="selectedPolicyPeriod" 
+            val="1_YEAR" 
+            label="1 Year"
+            @update:model-value="handlePolicyPeriodChange"
+          />
+        </div>
+        <div class="col-12 col-md-4">
+          <q-radio 
+            v-model="selectedPolicyPeriod" 
+            val="6_MONTHS" 
+            label="6 Months"
+            @update:model-value="handlePolicyPeriodChange"
+          />
+        </div>
+        <!-- <div class="col-12 col-md-4">
+          <q-radio 
+            v-model="selectedPolicyPeriod" 
+            val="QUARTERLY" 
+            label="Quarterly"
+            @update:model-value="handlePolicyPeriodChange"
+          />
+        </div> -->
+      </div>
+
+      <!-- Fechas del Policy Period para todos los radios -->
+      <div v-if="selectedPolicyPeriod" class="q-mb-md">
+        <div class="row q-col-gutter-md">
+          <div class="col-12 col-md-6">
+            <q-input 
+              v-model="policyPeriodStartDate" 
+              label="Start Date *" 
+              outlined 
+              :rules="[val => !!val || 'Start date is required']"
+            >
+              <template v-slot:append>
+                <q-icon name="event" class="cursor-pointer">
+                  <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                    <q-date 
+                      v-model="policyPeriodStartDate" 
+                      mask="YYYY-MM-DD"
+                      @update:model-value="handlePolicyDateChange('start')"
+                    >
+                      <div class="row items-center justify-end">
+                        <q-btn v-close-popup label="Close" color="primary" flat />
+                      </div>
+                    </q-date>
+                  </q-popup-proxy>
+                </q-icon>
+              </template>
+            </q-input>
           </div>
-        </q-form>
-      </q-card-section>
-    </q-card>
-  </q-expansion-item>
+          <div class="col-12 col-md-6">
+            <q-input 
+              v-model="policyPeriodEndDate" 
+              label="End Date *" 
+              outlined 
+              :rules="[val => !!val || 'End date is required']"
+            >
+              <template v-slot:append>
+                <q-icon name="event" class="cursor-pointer">
+                  <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                    <q-date 
+                      v-model="policyPeriodEndDate" 
+                      mask="YYYY-MM-DD"
+                      @update:model-value="handlePolicyDateChange('end')"
+                    >
+                      <div class="row items-center justify-end">
+                        <q-btn v-close-popup label="Close" color="primary" flat />
+                      </div>
+                    </q-date>
+                  </q-popup-proxy>
+                </q-icon>
+              </template>
+            </q-input>
+          </div>
+        </div>
+      </div>
+
+      <!-- Covernote Section para New Part Payment -->
+      <div v-if="selectedAccountCode === 'NEW_PART_PAYMENT'" class="q-mt-md bg-yellow-1 q-pa-md rounded-borders">
+        <div class="text-subtitle2 q-mb-sm">Grant covernote for 1 month</div>
+        <div class="text-caption text-grey q-mb-sm">
+          Available for New Part Payment
+        </div>
+        <div class="row q-col-gutter-md">
+          <div class="col-12 col-md-6">
+            <q-input v-model="covernoteStartDate" label="Start Date" outlined placeholder="YYYY-MM-DD"
+              :rules="[val => !!val || 'Start date is required']" hint="Enter date manually (YYYY-MM-DD)" />
+          </div>
+          <div class="col-12 col-md-6">
+            <q-input v-model="covernoteEndDate" label="End Date" outlined placeholder="YYYY-MM-DD"
+              :rules="[val => !!val || 'End date is required']" hint="Enter date manually (YYYY-MM-DD)" />
+          </div>
+        </div>
+        <div class="text-caption text-grey q-mt-sm">
+          Manual date entry required for 1-month covernote period
+        </div>
+      </div>
+
+      <!-- Quarterly Confirmation -->
+      <!-- <div v-if="selectedPolicyPeriod === 'QUARTERLY'" class="q-mt-md bg-orange-1 q-pa-md rounded-borders">
+        <div class="text-subtitle2 q-mb-sm">Quarterly Policy Confirmation</div>
+        <div class="text-caption text-grey q-mb-sm">
+          Check with MT if quarterly policy is available for this case
+        </div>
+        <q-checkbox v-model="quarterlyConfirmed" label="I confirm that MT has approved quarterly policy for this client"
+          :rules="[val => !!val || 'Quarterly confirmation is required']" />
+      </div> -->
+    </div>
+
+    <!-- ============================================= -->
+    <!-- Invoice Date (SEGUNDO) -->
+    <!-- ============================================= -->
+    <div class="q-mb-md">
+      <div class="text-subtitle2 q-mb-sm">1e) Invoice Date *</div>
+      <q-input v-model="invoiceDate" label="Invoice Date" outlined
+        :rules="[val => !!val || 'Invoice date is required']">
+        <template v-slot:append>
+          <q-icon name="event" class="cursor-pointer">
+            <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+              <q-date v-model="invoiceDate" mask="YYYY-MM-DD">
+                <div class="row items-center justify-end">
+                  <q-btn v-close-popup label="Close" color="primary" flat />
+                </div>
+              </q-date>
+            </q-popup-proxy>
+          </q-icon>
+        </template>
+      </q-input>
+    </div>
+  </div>
 </template>
 
 <script setup>
-import { reactive, watch } from 'vue';
+import { ref, reactive, computed, watch, defineEmits, defineProps } from 'vue'
 
-const form = reactive({
-  broker: '',
-  accCode: '',
-  policyMonths: null,
-  policyStartDate: null,
-  policyEndDate: null,
-  propertyRelationship: 'owner',
-  residenceType: 'Residence Only',
-  commercialActivityType: '',
-  otherCommercialActivity: '',
-  homeOption: ''
-});
+const emit = defineEmits(['update:modelValue', 'validation-changed'])
 
-const residenceTypeOptions = [
-  { label: 'Residence Only', value: 'Residence Only' },
-  { label: 'Residence & Commercial Activity', value: 'Residence & Commercial Activity' }
-];
-
-const commercialActivityOptions = [
-  'Short Term Rental',
-  'Long Term Rental',
-  'AirBnB',
-  'Home Office',
-  'Small Business',
-  'Other (please specify)'
-];
-
-const brokerOptions = ['ASD', 'AYD', 'ASH'];
-const accCodeOptions = ['ATR', 'ACS', 'AMN'];
-const policyMonthsOptions = [1, 3, 6, 12];
-const coverageOptions = [
-  { label: 'Home (building) only', value: 'Home (building) only' },
-  { label: 'Contents only', value: 'Contents only' },
-  { label: 'Home + Contents', value: 'Home + Contents' }
-];
-
-watch(() => [form.policyStartDate, form.policyMonths], ([startDate, months]) => {
-  if (startDate && months) {
-    const date = new Date(startDate);
-    date.setMonth(date.getMonth() + parseInt(months));
-    form.policyEndDate = date.toISOString().split('T')[0];
+const props = defineProps({
+  modelValue: {
+    type: Object,
+    default: () => ({})
   }
-});
+})
 
-watch(() => form.propertyRelationship, (newVal) => {
-  if (newVal === 'tenant') {
-    form.residenceType = 'Residence Only';
-    form.commercialActivityType = '';
-    form.otherCommercialActivity = '';
+// Variables principales
+const existingCustomer = ref(null)
+const selectedCustomer = ref(null)
+const selectedBroker = ref(null)
+const selectedAccountCode = ref(null)
+const selectedPolicyPeriod = ref(null)
+const policyPeriodStartDate = ref(null)
+const policyPeriodEndDate = ref(null)
+const invoiceDate = ref(null)
+const covernoteStartDate = ref(null)
+const covernoteEndDate = ref(null)
+const quarterlyConfirmed = ref(false)
+
+// Variables para crear nuevo cliente
+const savingCustomer = ref(false)
+const filteredCustomers = ref([])
+const customerSelectRef = ref(null)
+
+// Opciones
+const insurancePeriodOptions = [
+  { label: '1 Month', value: 1 },
+  { label: '3 Months', value: 3 },
+  { label: '6 Months', value: 6 },
+  { label: '12 Months', value: 12 },
+  { label: '24 Months', value: 24 },
+  { label: '36 Months', value: 36 }
+]
+
+const brokerOptions = [
+  { label: 'Broker A', value: 'A' },
+  { label: 'Broker B', value: 'B' },
+  { label: 'Broker C', value: 'C' }
+]
+
+const accountCodeOptions = [
+  { label: 'Standard Payment', value: 'STANDARD' },
+  { label: 'New Part Payment', value: 'NEW_PART_PAYMENT' },
+  { label: 'Corporate Account', value: 'CORPORATE' }
+]
+
+// Mock data de clientes
+const mockCustomers = [
+  {
+    id: 1,
+    code: 'CUST001',
+    fullName: 'John Smith',
+    fullMailingAddress: '123 Main St, New York, NY 10001',
+    homeOrWorkTel: '+1234567890',
+    cellMobile: '+1234567890',
+    email: 'john.smith@email.com',
+    persoonsNumber: 'P123456',
+    businessProfession: 'Software Engineer',
+    insurancePeriodMonths: 12,
+    insuranceDateFrom: '2024-01-01',
+    insuranceDateUntil: '2024-12-31',
+    premisesSituation: 'Office Building A, 123 Main Street, New York, NY'
+  },
+  {
+    id: 2,
+    code: 'CUST002',
+    fullName: 'Maria Garcia',
+    fullMailingAddress: '456 Oak Ave, Los Angeles, CA 90001',
+    homeOrWorkTel: '+1987654321',
+    cellMobile: '+1987654321',
+    email: 'maria.garcia@email.com',
+    persoonsNumber: 'P654321',
+    businessProfession: 'Business Owner',
+    insurancePeriodMonths: 6,
+    insuranceDateFrom: '2024-01-01',
+    insuranceDateUntil: '2024-06-30',
+    premisesSituation: 'Retail Store, 456 Oak Avenue, Los Angeles, CA'
   }
-});
+]
+
+// Datos para nuevo cliente
+const newCustomer = reactive({
+  fullName: '',
+  fullMailingAddress: '',
+  homeOrWorkTel: '',
+  cellMobile: '',
+  email: '',
+  persoonsNumber: '',
+  businessProfession: '',
+  insurancePeriodMonths: null,
+  insuranceDateFrom: '',
+  insuranceDateUntil: '',
+  premisesSituation: ''
+})
+
+// Computed properties
+const isStepValid = computed(() => {
+  // Validar si se seleccionó si el cliente existe o no
+  if (!existingCustomer.value) return false
+  
+  // Validar cliente
+  if (existingCustomer.value === 'yes' && !selectedCustomer.value) return false
+  if (existingCustomer.value === 'no' && !newCustomer.fullName) return false
+  
+  // Validar campos obligatorios
+  const baseValidation = selectedBroker.value &&
+    invoiceDate.value
+  
+  if (!baseValidation) return false
+  
+  // Validar Policy Period
+  if (!selectedPolicyPeriod.value) return false
+  
+  // Validar fechas del Policy Period
+  if (!policyPeriodStartDate.value || !policyPeriodEndDate.value) return false
+  
+  // Validar confirmación quarterly
+  if (selectedPolicyPeriod.value === 'QUARTERLY' && !quarterlyConfirmed.value) return false
+  
+  // Validar covernote si se seleccionó New Part Payment
+  if (selectedAccountCode.value === 'NEW_PART_PAYMENT') {
+    if (!covernoteStartDate.value || !covernoteEndDate.value) return false
+  }
+  
+  return true
+})
+
+// Watchers
+watch(isStepValid, (newVal) => {
+  emit('validation-changed', newVal)
+}, { immediate: true })
+
+watch(() => ({
+  existingCustomer: existingCustomer.value,
+  customer: selectedCustomer.value,
+  broker: selectedBroker.value,
+  accountCode: selectedAccountCode.value,
+  policyPeriod: selectedPolicyPeriod.value,
+  policyPeriodDates: {
+    start: policyPeriodStartDate.value,
+    end: policyPeriodEndDate.value
+  },
+  quarterlyConfirmed: quarterlyConfirmed.value,
+  covernote: {
+    enabled: selectedAccountCode.value === 'NEW_PART_PAYMENT',
+    start: covernoteStartDate.value,
+    end: covernoteEndDate.value
+  },
+  invoiceDate: invoiceDate.value,
+  newCustomer: existingCustomer.value === 'no' ? { ...newCustomer } : null
+}), (newVal) => {
+  emit('update:modelValue', newVal)
+}, { deep: true, immediate: true })
+
+// Methods
+const handleExistingCustomerChange = (value) => {
+  console.log('Existing customer selection:', value)
+  
+  if (value === 'yes') {
+    // Reset new customer form
+    Object.keys(newCustomer).forEach(key => {
+      newCustomer[key] = ''
+    })
+    filteredCustomers.value = [...mockCustomers]
+  } else if (value === 'no') {
+    // Reset selected customer
+    selectedCustomer.value = null
+  }
+}
+
+const filterCustomers = (val, update) => {
+  update(() => {
+    if (val === '') {
+      filteredCustomers.value = mockCustomers
+    } else {
+      const needle = val.toLowerCase()
+      filteredCustomers.value = mockCustomers.filter(
+        customer => customer.fullName.toLowerCase().includes(needle)
+      )
+    }
+  })
+}
+
+const handleCustomerSelect = (customer) => {
+  console.log('Customer selected:', customer)
+  if (customer) {
+    // Auto-fill invoice date if not set
+    if (!invoiceDate.value) {
+      invoiceDate.value = new Date().toISOString().split('T')[0]
+    }
+  }
+}
+
+const handleClearCustomer = () => {
+  selectedCustomer.value = null
+}
+
+const handlePolicyPeriodChange = (policyPeriod) => {
+  console.log('Policy period selected:', policyPeriod)
+  
+  // Reset quarterly confirmation si no es QUARTERLY
+  if (policyPeriod !== 'QUARTERLY') {
+    quarterlyConfirmed.value = false
+  }
+  
+  // Establecer fecha de inicio por defecto si no está establecida
+  if (!policyPeriodStartDate.value) {
+    policyPeriodStartDate.value = new Date().toISOString().split('T')[0]
+  }
+  
+  // Calcular fecha de fin según el periodo seleccionado
+  calculatePolicyEndDate(policyPeriod)
+}
+
+const calculatePolicyEndDate = (period) => {
+  if (!policyPeriodStartDate.value) return
+  
+  const startDate = new Date(policyPeriodStartDate.value)
+  let endDate = new Date(startDate)
+  
+  switch(period) {
+    case '1_YEAR':
+      endDate.setFullYear(startDate.getFullYear() + 1)
+      break
+    case '6_MONTHS':
+      endDate.setMonth(startDate.getMonth() + 6)
+      break
+    case 'QUARTERLY':
+      endDate.setMonth(startDate.getMonth() + 3)
+      break
+  }
+  
+  // Restar un día para que sea hasta el final del día anterior
+  endDate.setDate(endDate.getDate() - 1)
+  
+  policyPeriodEndDate.value = endDate.toISOString().split('T')[0]
+}
+
+const handlePolicyDateChange = (type) => {
+  console.log(`${type} date changed:`, type === 'start' ? policyPeriodStartDate.value : policyPeriodEndDate.value)
+  
+  // Si se cambia la fecha de inicio, recalcular la fecha de fin según el periodo seleccionado
+  if (type === 'start' && selectedPolicyPeriod.value) {
+    calculatePolicyEndDate(selectedPolicyPeriod.value)
+  }
+}
+
+const handleAccountCodeChange = (accountCode) => {
+  console.log('Account code selected:', accountCode)
+  
+  // Si se selecciona New Part Payment, sugerir fechas de covernote
+  if (accountCode === 'NEW_PART_PAYMENT') {
+    suggestCovernoteDates()
+  } else {
+    // Si se cambia a otra opción, limpiar covernote
+    covernoteStartDate.value = null
+    covernoteEndDate.value = null
+  }
+}
+
+const suggestCovernoteDates = () => {
+  if (policyPeriodStartDate.value) {
+    if (!covernoteStartDate.value) {
+      covernoteStartDate.value = policyPeriodStartDate.value
+    }
+    if (!covernoteEndDate.value) {
+      const endDate = new Date(policyPeriodStartDate.value)
+      endDate.setMonth(endDate.getMonth() + 1)
+      covernoteEndDate.value = endDate.toISOString().split('T')[0]
+    }
+  }
+}
+
+const createNewCustomer = async () => {
+  // Validar campos requeridos
+  const requiredFields = ['fullName', 'fullMailingAddress', 'homeOrWorkTel', 
+                         'cellMobile', 'email', 'businessProfession',
+                         'insurancePeriodMonths', 'insuranceDateFrom', 
+                         'insuranceDateUntil', 'premisesSituation']
+  
+  for (const field of requiredFields) {
+    if (!newCustomer[field]) {
+      console.error(`Field ${field} is required`)
+      return
+    }
+  }
+  
+  savingCustomer.value = true
+  
+  try {
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    
+    const newCustomerCode = `CUST${String(mockCustomers.length + 1).padStart(3, '0')}`
+    
+    const newCustomerObj = {
+      id: mockCustomers.length + 1,
+      code: newCustomerCode,
+      fullName: newCustomer.fullName,
+      fullMailingAddress: newCustomer.fullMailingAddress,
+      homeOrWorkTel: newCustomer.homeOrWorkTel,
+      cellMobile: newCustomer.cellMobile,
+      email: newCustomer.email,
+      persoonsNumber: newCustomer.persoonsNumber,
+      businessProfession: newCustomer.businessProfession,
+      insurancePeriodMonths: newCustomer.insurancePeriodMonths,
+      insuranceDateFrom: newCustomer.insuranceDateFrom,
+      insuranceDateUntil: newCustomer.insuranceDateUntil,
+      premisesSituation: newCustomer.premisesSituation
+    }
+    
+    mockCustomers.push(newCustomerObj)
+    filteredCustomers.value = [...mockCustomers]
+    
+    // Seleccionar el nuevo cliente automáticamente
+    selectedCustomer.value = newCustomerObj
+    existingCustomer.value = 'yes'
+    
+    // Limpiar formulario
+    Object.keys(newCustomer).forEach(key => {
+      newCustomer[key] = ''
+    })
+    
+    console.log('New customer created:', newCustomerObj)
+    
+  } catch (error) {
+    console.error('Error creating customer:', error)
+  } finally {
+    savingCustomer.value = false
+  }
+}
+
+const validate = () => {
+  return isStepValid.value
+}
+
+const resetForm = () => {
+  existingCustomer.value = null
+  selectedCustomer.value = null
+  selectedBroker.value = null
+  selectedAccountCode.value = null
+  selectedPolicyPeriod.value = null
+  policyPeriodStartDate.value = null
+  policyPeriodEndDate.value = null
+  invoiceDate.value = today.toISOString().split('T')[0]
+  covernoteStartDate.value = null
+  covernoteEndDate.value = null
+  quarterlyConfirmed.value = false
+  
+  Object.keys(newCustomer).forEach(key => {
+    newCustomer[key] = ''
+  })
+}
+
+const today = new Date()
+invoiceDate.value = today.toISOString().split('T')[0]
+
+// Watch for prop changes
+watch(() => props.modelValue, (newVal) => {
+  if (newVal.existingCustomer) existingCustomer.value = newVal.existingCustomer
+  if (newVal.customer) selectedCustomer.value = newVal.customer
+  if (newVal.broker) selectedBroker.value = newVal.broker
+  if (newVal.accountCode) selectedAccountCode.value = newVal.accountCode
+  if (newVal.policyPeriod) selectedPolicyPeriod.value = newVal.policyPeriod
+  if (newVal.policyPeriodDates) {
+    policyPeriodStartDate.value = newVal.policyPeriodDates.start
+    policyPeriodEndDate.value = newVal.policyPeriodDates.end
+  }
+  if (newVal.invoiceDate) invoiceDate.value = newVal.invoiceDate
+  if (newVal.quarterlyConfirmed) quarterlyConfirmed.value = newVal.quarterlyConfirmed
+  if (newVal.covernote) {
+    covernoteStartDate.value = newVal.covernote.start
+    covernoteEndDate.value = newVal.covernote.end
+  }
+}, { immediate: true })
 
 defineExpose({
-  formData: form,
-  resetForm: () => {
-    Object.assign(form, {
-      broker: '',
-      accCode: '',
-      policyMonths: null,
-      policyStartDate: null,
-      policyEndDate: null,
-      propertyRelationship: 'owner',
-      residenceType: 'Residence Only',
-      commercialActivityType: '',
-      otherCommercialActivity: '',
-      homeOption: ''
-    });
-  }
-});
+  validate,
+  resetForm
+})
 </script>
 
 <style scoped>
-.full-width {
-  width: 100%;
+.step1-container {
+  max-width: 600px;
 }
-.broker {
-  display: flex;
-  justify-content: space-between;
-  gap: 15px;
+
+.rounded-borders {
+  border-radius: 8px;
 }
-.q-mt-lg {
-  margin-top: 24px;
+
+.insurance-period-section,
+.premises-section {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 16px;
+  background-color: #fafafa;
+}
+
+.insurance-period-section {
+  background-color: #fff8e1;
+}
+
+.premises-section {
+  background-color: #e8f5e8;
+}
+
+.q-radio {
+  padding: 8px 0;
+}
+
+/* Estilos para los radios más simples */
+.q-radio {
+  margin-bottom: 8px;
+}
+
+.q-radio__label {
+  font-size: 1rem;
 }
 </style>

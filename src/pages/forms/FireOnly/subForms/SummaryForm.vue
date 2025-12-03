@@ -1,232 +1,345 @@
 <template>
-  <q-expansion-item
-    group="form-sections"
-    icon="summarize"
-    label="Summary and Conditions"
-    header-class="text-primary text-weight-bold"
-  >
-    <q-card>
+  <div>
+    <div class="text-h6 text-primary">Step 7: Summary</div>
+    
+    <q-card flat bordered class="q-mb-md">
       <q-card-section>
-        <div class="q-gutter-y-lg">
-          <div v-if="formData.insuranceHistory" class="q-pa-sm">
-            <p class="text-weight-bold">Insurance & Claim History:</p>
-            <p>{{ formData.insuranceHistory }}</p>
+        <div class="text-subtitle1 q-mb-sm">Form Overview</div>
+        
+        <!-- Type of Cover -->
+        <div class="row q-col-gutter-md q-mb-sm">
+          <div class="col-12 col-md-6">
+            <strong>Type of Cover:</strong> {{ formData.typeOfCover || 'Not specified' }}
           </div>
-
-          <div v-if="formData.signature" class="q-pa-sm">
-            <p class="text-weight-bold">Signature:</p>
-            <p>{{ formData.signature }}</p>
+          <div class="col-12 col-md-6">
+            <strong>Customer Type:</strong> {{ formData.customerType || 'Not specified' }}
           </div>
+        </div>
 
-          <div class="q-pa-sm">
-            <p class="text-weight-bold">Standard Policy Conditions:</p>
-            <ul>
-              <li>Standard NIA policy terms & conditions as per cover</li>
-            </ul>
+        <!-- Product Information -->
+        <div class="row q-col-gutter-md q-mb-sm" v-if="formData.selectedProduct">
+          <div class="col-12">
+            <strong>Selected Product:</strong> {{ formData.selectedProduct }}
           </div>
+        </div>
 
-          <div class="q-pa-sm">
-            <p class="text-weight-bold">Special Conditions:</p>
-            <q-select
-              filled
-              v-model="localState.specialConditions"
-              :options="filteredSpecialConditionOptions"
-              label="Select special conditions"
-              multiple
-              use-chips
-              dense
-              standout
-            />
-
-            <template v-if="automaticConditions.length > 0">
-              <p class="q-mt-md text-weight-bold">Automatic Conditions:</p>
-              <ul>
-                <li v-for="(condition, index) in automaticConditions" :key="index">
-                  {{ condition }}
-                </li>
-              </ul>
-            </template>
-
-            <q-input
-              v-model="localState.additionalClause"
-              label="Additional Clause"
-              dense
-              filled
-              class="q-mt-md"
-            />
-          </div>
-
-          <div v-if="showMortgageClause" class="q-pa-sm">
-            <p class="text-weight-bold">Mortgage Clause in Favor of:</p>
-            <p>{{ formData.mortgageInstitution || formData.mortgageInstitutionOther }}</p>
-          </div>
-
-          <div class="q-pa-sm">
-            <p class="text-weight-bold">Excess:</p>
-
-            <div
-              v-if="formData.buildingOccupation === 'Fire only'"
-              class="row items-center q-gutter-sm"
-            >
-              <span>Excess Applicable: Awg.</span>
-              <q-input
-                v-model="localState.excessAmount"
-                type="number"
-                dense
-                filled
-                style="width: 120px"
-              />
-              <span>On each and every claim</span>
-            </div>
-
-            <div v-if="formData.buildingOccupation !== 'Fire only'" class="q-gutter-y-sm">
-              <div class="row items-center q-gutter-sm">
-                <span>Excess for catastrophic perils: 2% of total sum insured</span>
+        <!-- General Information Summary -->
+        <q-expansion-item
+          label="General Information"
+          icon="info"
+          class="q-mb-sm"
+        >
+          <q-card>
+            <q-card-section>
+              <div v-if="formData.customer">
+                <strong>Customer:</strong> {{ formData.customer }}
               </div>
-              <div class="row items-center q-gutter-sm">
-                <span>Excess Any Other Perils: Awg.</span>
-                <q-input
-                  v-model="localState.excessAmount"
-                  type="number"
-                  dense
-                  filled
-                  style="width: 120px"
-                />
-                <span>On each and every claim</span>
+              <div v-if="formData.broker">
+                <strong>Broker:</strong> {{ formData.broker }}
               </div>
-            </div>
+              <div v-if="formData.inceptionDate">
+                <strong>Inception Date:</strong> {{ formData.inceptionDate }}
+              </div>
+              <div v-if="formData.policyPeriod">
+                <strong>Policy Period:</strong> {{ formData.policyPeriod }}
+              </div>
+              <div v-if="formData.premisesLocation">
+                <strong>Premises Location:</strong> {{ formData.premisesLocation }}
+              </div>
+            </q-card-section>
+          </q-card>
+        </q-expansion-item>
 
-            <div v-if="hasSolarPanels" class="row items-center q-gutter-sm q-mt-sm">
-              <span>Excess Solar Panels: Awg. 1,500.00 each and every claim</span>
-            </div>
-          </div>
+        <!-- Building Details Summary -->
+        <q-expansion-item
+          label="Building Details"
+          icon="home"
+          class="q-mb-sm"
+        >
+          <q-card>
+            <q-card-section>
+              <div v-if="formData.numberOfStoreys">
+                <strong>Number of Storeys:</strong> {{ formData.numberOfStoreys }}
+              </div>
+              <div v-if="formData.externalWalls">
+                <strong>External Walls:</strong> {{ formData.externalWalls }}
+                <span v-if="formData.otherExternalWalls"> - {{ formData.otherExternalWalls }}</span>
+              </div>
+              <div v-if="formData.roofType">
+                <strong>Roof Type:</strong> {{ formData.roofType }}
+                <span v-if="formData.otherRoof"> - {{ formData.otherRoof }}</span>
+              </div>
+              <div v-if="formData.yearOfConstruction">
+                <strong>Year of Construction:</strong> {{ formData.yearOfConstruction }}
+              </div>
+            </q-card-section>
+          </q-card>
+        </q-expansion-item>
 
-          <div v-if="formData.buildingOccupation === 'Smart Economy Cas'" class="q-pa-sm">
-            <p class="text-weight-bold">Special Conditions:</p>
-            <ul>
-              <li>No Jewelry / valuables outside safe should not exceed AWG 900.00 (US$ 500.00)</li>
-              <li v-if="formData.indexRequired === 'Yes'">Subject to Index Clause</li>
-              <li v-if="hasSolarPanels">Subject to Solar Panels Clause</li>
-              <li v-if="hasLossOfRent">Subject to Loss of Rent Clause</li>
-            </ul>
-          </div>
+        <!-- Insurance Amounts Summary -->
+        <q-expansion-item
+          label="Insurance Amounts"
+          icon="attach_money"
+          class="q-mb-sm"
+        >
+          <q-card>
+            <q-card-section>
+              <div v-if="customerType === 'Private'">
+                <div class="text-subtitle2 q-mb-sm">Building Coverage</div>
+                <div v-for="item in formData.buildingItems" :key="item" class="q-mb-xs">
+                  • {{ getItemLabel(item, 'building') }}: {{ formatCurrency(formData.buildingAmounts[item]) }}
+                </div>
 
-          <div v-if="isCFTOrCFTE" class="q-pa-sm">
-            <p class="text-weight-bold">Special Conditions:</p>
-            <ul>
-              <li>Acts of Terrorism and Malicious Damage are excluded from cover</li>
-              <li>Subject to Infectious Disease Exclusion Clause</li>
-              <li>Subject to Dynamo Exclusion Clause</li>
-              <li>Subject to CFT 5 Clause</li>
-              <li>Police Report Must</li>
-              <li>No Jewelry / valuables outside safe should not exceed AWG 900.00 (US$ 500.00)</li>
-              <li v-if="formData.indexRequired === 'Yes'">Subject to Index Clause</li>
-              <li v-if="hasSolarPanels">Subject to Solar Panels Clause</li>
-              <li v-if="hasLossOfRent">Subject to Loss of Rent Clause</li>
-            </ul>
-          </div>
+                <div class="text-subtitle2 q-mt-md q-mb-sm">Contents Coverage</div>
+                <div v-for="item in formData.generalContentsItems" :key="item" class="q-mb-xs">
+                  • {{ getItemLabel(item, 'contents') }}: {{ formatCurrency(formData.generalContentsAmounts[item]) }}
+                </div>
+              </div>
+
+              <div v-else>
+                <div class="text-subtitle2 q-mb-sm">Commercial Coverage</div>
+                <div v-for="item in formData.buildingItems" :key="item" class="q-mb-xs">
+                  • {{ getItemLabel(item, 'commercialBuilding') }}: {{ formatCurrency(formData.buildingAmounts[item]) }}
+                </div>
+              </div>
+
+              <div class="q-mt-md">
+                <strong>Total Sum Insured:</strong> {{ formatCurrency(totalSumInsured) }}
+              </div>
+            </q-card-section>
+          </q-card>
+        </q-expansion-item>
+
+        <!-- Premium Calculation Summary -->
+        <q-expansion-item
+          v-if="premiumCalculation"
+          label="Premium Calculation"
+          icon="calculate"
+        >
+          <q-card>
+            <q-card-section>
+              <div v-for="item in premiumCalculation.items" :key="item.category" class="q-mb-xs">
+                • {{ item.category }}: {{ formatCurrency(item.sumInsured) }} × {{ item.rate }}‰ = {{ formatCurrency(item.premium) }}
+              </div>
+              
+              <div class="q-mt-md">
+                <strong>Total Premium:</strong> {{ formatCurrency(premiumCalculation.totalPremium) }}
+              </div>
+              
+              <div v-if="premiumCalculation.discountApplied" class="text-negative">
+                <strong>Discount:</strong> -{{ formatCurrency(premiumCalculation.discountAmount) }}
+              </div>
+              
+              <div v-if="premiumCalculation.additionalCharges">
+                <div v-for="charge in premiumCalculation.additionalCharges" :key="charge.description" class="q-mb-xs">
+                  • {{ charge.description }}: {{ formatCurrency(charge.amount) }}
+                </div>
+              </div>
+              
+              <div class="text-h6 q-mt-md text-primary">
+                <strong>Final Premium:</strong> {{ formatCurrency(premiumCalculation.finalPremium) }}
+              </div>
+            </q-card-section>
+          </q-card>
+        </q-expansion-item>
+      </q-card-section>
+    </q-card>
+
+    <!-- Declaration -->
+    <q-card flat bordered class="bg-grey-1">
+      <q-card-section>
+        <div class="text-subtitle1 q-mb-sm">Declaration</div>
+        
+        <q-checkbox
+          v-model="declarationConfirmed"
+          label="I confirm that all information provided is true and accurate to the best of my knowledge"
+        />
+        
+        <q-checkbox
+          v-model="termsAccepted"
+          label="I agree to the terms and conditions of the insurance policy"
+        />
+        
+        <q-checkbox
+          v-model="inspectionAuthorized"
+          label="I authorize inspection of the premises if required"
+        />
+
+        <div class="q-mt-md">
+          <q-input
+            v-model="signature"
+            label="Signature"
+            outlined
+            placeholder="Type your full name as signature"
+          />
         </div>
       </q-card-section>
     </q-card>
-  </q-expansion-item>
+
+    <!-- Action Buttons -->
+    <div class="q-mt-md">
+      <q-btn
+        label="Download PDF Summary"
+        color="primary"
+        icon="picture_as_pdf"
+        @click="downloadPDF"
+        :disable="!isFormComplete"
+      />
+      
+      <q-btn
+        label="Print Summary"
+        color="secondary"
+        icon="print"
+        @click="printSummary"
+        class="q-ml-sm"
+        :disable="!isFormComplete"
+      />
+    </div>
+  </div>
 </template>
 
 <script setup>
-import { computed, reactive, defineExpose } from 'vue'
+import { ref, computed, watch,  } from 'vue'
 
 const props = defineProps({
   formData: {
     type: Object,
-    required: true,
+    default: () => ({})
+  },
+  resetTrigger: {
+    type: Boolean,
+    default: false
+  },
+  premiumCalculation: {
+    type: Object,
+    default: null
   }
 })
 
-const localState = reactive({
-  specialConditions: [],
-  additionalClause: '',
-  excessAmount: ''
+// Declaration state
+const declarationConfirmed = ref(false)
+const termsAccepted = ref(false)
+const inspectionAuthorized = ref(false)
+const signature = ref('')
+
+// Computed properties
+const customerType = computed(() => props.formData.customerType || 'Private')
+
+const totalSumInsured = computed(() => {
+  let total = 0
+  
+  if (customerType.value === 'Private') {
+    // Sum private insurance amounts
+    props.formData.buildingItems?.forEach(item => {
+      total += Number(props.formData.buildingAmounts?.[item]) || 0
+    })
+    
+    props.formData.generalContentsItems?.forEach(item => {
+      total += Number(props.formData.generalContentsAmounts?.[item]) || 0
+    })
+  } else {
+    // Sum commercial insurance amounts
+    props.formData.buildingItems?.forEach(item => {
+      total += Number(props.formData.buildingAmounts?.[item]) || 0
+    })
+  }
+  
+  return total
 })
 
-const resetForm = () => {
-  localState.specialConditions = []
-  localState.additionalClause = ''
-  localState.excessAmount = ''
-  console.log('Summary form reset successfully')
+const isFormComplete = computed(() => {
+  return declarationConfirmed.value && 
+         termsAccepted.value && 
+         inspectionAuthorized.value && 
+         signature.value.trim() !== '' &&
+         totalSumInsured.value > 0
+})
+
+// Item label mappings
+const itemLabels = {
+  building: {
+    'main_building': 'Main Building',
+    'fence': 'Fence/Boundary Wall',
+    'servants_quarters': 'Servant Quarters',
+    'tenants_improvements': 'Tenant Improvements',
+    'landscaping': 'Landscaping',
+    'swimming_pool': 'Swimming Pool',
+    'gazebo': 'Gazebo',
+    'bar': 'Bar',
+    'storage': 'Storage',
+    'solar_panels': 'Solar Panels'
+  },
+  contents: {
+    'furniture': 'Household Furniture',
+    'personal_effects': 'Personal Effects',
+    'piano': 'Piano/Organ',
+    'external_property': 'External Property'
+  },
+  commercialBuilding: {
+    'main_building': 'Main Building',
+    'warehouse': 'Warehouse',
+    'fence': 'Fence/Boundary Wall',
+    'landscaping': 'Landscaping',
+    'apartment': 'Apartment',
+    'laundry': 'Laundry Room',
+    'swimming_pool': 'Swimming Pool',
+    'tenants_improvements': 'Tenant Improvements',
+    'storage': 'Storage',
+    'solar_panels': 'Solar Panels'
+  }
 }
 
-defineExpose({ resetForm })
+// Methods
+const formatCurrency = (value) => {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2,
+  }).format(value || 0)
+}
 
-const allSpecialConditionOptions = [
-  'Subject to special conditions relating to buildings in course of construction',
-  'Acts of Terrorism and Malicious Damage are excluded from cover',
-  'Subject to Reinstatement Value Clause',
-  'Subject to Infectious Disease Exclusion Clause',
-  'Subject to Dynamo Exclusion Clause',
-  'Subject to Risk Prevention warranty',
-]
+const getItemLabel = (itemKey, category) => {
+  return itemLabels[category]?.[itemKey] || itemKey
+}
 
-const hasLossOfRent = computed(() => {
-  return props.formData.specialCoverages?.includes('On loss of rent receivable _____ weeks')
+const downloadPDF = () => {
+  // Implement PDF download logic
+  console.log('Downloading PDF summary...')
+  // This would typically generate and download a PDF file
+}
+
+const printSummary = () => {
+  window.print()
+}
+
+const resetForm = () => {
+  declarationConfirmed.value = false
+  termsAccepted.value = false
+  inspectionAuthorized.value = false
+  signature.value = ''
+}
+
+// Watch for reset trigger
+watch(() => props.resetTrigger, (newVal) => {
+  if (newVal) {
+    resetForm()
+  }
 })
 
-const filteredSpecialConditionOptions = computed(() => {
-  let options = [...allSpecialConditionOptions]
-
-  if (isCFTOrCFTE.value) {
-    return [
-      'Acts of Terrorism and Malicious Damage are excluded from cover',
-      'Subject to Infectious Disease Exclusion Clause',
-      'Subject to Dynamo Exclusion Clause',
-      'Subject to CFT 5 Clause',
-      'Police Report Must',
-      'No Jewelry / valuables outside safe should not exceed AWG 900.00 (US$ 500.00)',
-    ]
-  }
-
-  if (['Smart Cas', 'Smart Economy Cas'].includes(props.formData.buildingOccupation)) {
-    return options.filter((opt) => !opt.includes('Acts of Terrorism'))
-  }
-
-  if (!['Fire only', 'Fire All Extended'].includes(props.formData.buildingOccupation)) {
-    return options.filter((opt) => !opt.includes('Reinstatement Value'))
-  }
-
-  return options
-})
-
-const automaticConditions = computed(() => {
-  const conditions = []
-
-  if (props.formData.indexRequired === 'Yes') {
-    conditions.push('Subject to Index Clause')
-  }
-
-  if (hasSolarPanels.value) {
-    conditions.push('Subject to Solar Panels Clause')
-  }
-
-  if (props.formData.specialCoverages?.includes('On loss of rent receivable _____ weeks')) {
-    conditions.push('Subject to Loss of Rent Clause')
-  }
-
-  return conditions
-})
-
-const showMortgageClause = computed(() => {
-  return (
-    props.formData.mortgageClause === 'Yes' &&
-    (props.formData.mortgageInstitution || props.formData.mortgageInstitutionOther)
-  )
-})
-
-const hasSolarPanels = computed(() => {
-  return (
-    props.formData.buildingItems?.includes('On Solar Panels') ||
-    props.formData.buildingAmounts?.['On Solar Panels'] > 0
-  )
-})
-
-const isCFTOrCFTE = computed(() => {
-  return props.formData.buildingOccupation === 'CFT' || props.formData.buildingOccupation === 'CFTE'
+// Expose methods to parent
+defineExpose({
+  resetForm
 })
 </script>
+
+<style scoped>
+@media print {
+  .q-btn {
+    display: none !important;
+  }
+  
+  .q-expansion-item__content {
+    display: block !important;
+  }
+}
+</style>

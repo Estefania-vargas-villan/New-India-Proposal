@@ -31,7 +31,7 @@
         </q-card>
       </div>
 
-      <div class="col-xs-12 col-sm-6 col-md-3">
+      <!-- <div class="col-xs-12 col-sm-6 col-md-3">
         <q-card class="full-height" flat bordered>
           <q-card-section class="text-center">
             <q-icon name="list" size="xl" color="primary" />
@@ -52,9 +52,9 @@
             />
           </q-card-actions>
         </q-card>
-      </div>
+      </div> -->
 
-      <div class="col-xs-12 col-sm-6 col-md-3">
+      <!-- <div class="col-xs-12 col-sm-6 col-md-3">
         <q-card class="full-height" flat bordered>
           <q-card-section class="text-center">
             <q-icon name="bolt" size="xl" color="orange" />
@@ -75,9 +75,9 @@
             />
           </q-card-actions>
         </q-card>
-      </div>
+      </div> -->
 
-      <div class="col-xs-12 col-sm-6 col-md-3">
+      <!-- <div class="col-xs-12 col-sm-6 col-md-3">
         <q-card class="full-height" flat bordered>
           <q-card-section class="text-center">
             <q-icon name="savings" size="xl" color="green" />
@@ -98,7 +98,7 @@
             />
           </q-card-actions>
         </q-card>
-      </div>
+      </div> -->
     </div>
   </q-page>
 </template>

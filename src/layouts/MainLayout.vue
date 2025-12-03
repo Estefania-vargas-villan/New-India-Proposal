@@ -89,24 +89,24 @@ const formularios = [
     icono: 'whatshot',
     ruta: '/FireOnly',
   },
-  {
-    titulo: 'Fire All Extended',
-    descripcion: 'Plan de acción ante emergencias',
-    icono: 'directions_run',
-    ruta: '/FireAll',
-  },
-  {
-    titulo: 'Smart Cas',
-    descripcion: 'Inspección eléctrica',
-    icono: 'bolt',
-    ruta: '/SmartCas',
-  },
-  {
-    titulo: 'Smart Economy Cas',
-    descripcion: 'Registro de simulacros',
-    icono: 'event',
-    ruta: '/SmartEconomyCas',
-  },
+  // {
+  //   titulo: 'Fire All Extended',
+  //   descripcion: 'Plan de acción ante emergencias',
+  //   icono: 'directions_run',
+  //   ruta: '/FireAll',
+  // },
+  // {
+  //   titulo: 'Smart Cas',
+  //   descripcion: 'Inspección eléctrica',
+  //   icono: 'bolt',
+  //   ruta: '/SmartCas',
+  // },
+  // {
+  //   titulo: 'Smart Economy Cas',
+  //   descripcion: 'Registro de simulacros',
+  //   icono: 'event',
+  //   ruta: '/SmartEconomyCas',
+  // },
 ]
 
 function goTo(ruta) {

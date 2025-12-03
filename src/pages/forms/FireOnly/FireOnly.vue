@@ -1,7 +1,7 @@
 <template>
   <q-page class="q-pa-md">
     <div class="q-mb-lg">
-      <h1 class="text-h4 text-primary q-mb-sm text-center">FIRE ONLY</h1>
+      <h1 class="text-h4 text-primary q-mb-sm text-center">FIRE INSURANCE QUOTATION</h1>
       <q-card flat bordered class="bg-grey-1">
         <q-card-section>
           <p class="text-body1 text-center">
@@ -16,440 +16,581 @@
       </q-card>
     </div>
 
-    <div class="q-gutter-y-md">
-      <q-card flat bordered class="q-mb-md">
-        <q-card-section>
-          <GeneralInformation ref="generalInfoForm" />
-        </q-card-section>
-      </q-card>
-      <q-card flat bordered class="q-mb-md">
-        <q-card-section>
-          <ProposerInformation ref="proposerInfoForm" />
-        </q-card-section>
-      </q-card>
-      <q-card flat bordered class="q-mb-md">
-        <q-card-section>
-          <BuildingConstruction ref="buildingConstructionForm" />
-        </q-card-section>
-      </q-card>
-      <q-card flat bordered class="q-mb-md">
-        <q-card-section>
-          <CoverRequired ref="coverRequiredForm" />
-        </q-card-section>
-      </q-card>
-      <q-card flat bordered class="q-mb-md">
-        <q-card-section>
-          <InsuranceAmounts ref="insuranceAmountsForm" />
-        </q-card-section>
-      </q-card>
-      <q-card flat bordered class="q-mb-md">
-        <q-card-section>
-          <Summary ref="summaryRef" :form-data="combinedFormData" :reset-trigger="resetFlag" />
-        </q-card-section>
-      </q-card>
-    </div>
+    <q-card flat bordered class="q-mb-md">
+      <q-expansion-item 
+        v-model="expandedSections.typeOfCover" 
+        expand-icon-toggle
+        header-class="bg-blue-1 text-primary"
+        :default-opened="true"
+      >
+        <template v-slot:header>
+          <q-item-section>
+            <q-item-label class="text-h6"> Type of Cover</q-item-label>
+            <q-item-label caption>Select type of insurance coverage</q-item-label>
+          </q-item-section>
+          <q-item-section side>
+            <q-badge :color="getSectionStatusColor('typeOfCover')" 
+                    :label="getSectionStatusText('typeOfCover')" />
+          </q-item-section>
+        </template>
 
-    <q-card v-if="premiumCalculation" class="q-mt-md" flat bordered>
-      <q-card-section>
-        <div class="text-h6 text-primary">Quotation Result</div>
-        <q-markup-table dense class="q-mt-sm">
-          <thead>
-            <tr class="bg-grey-3">
-              <th class="text-left">Category</th>
-              <th class="text-right">Insured Amount</th>
-              <th class="text-right">Rate</th>
-              <th class="text-right">Premium</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(item, index) in premiumCalculation.items" :key="index">
-              <td class="text-left">{{ item.category }}</td>
-              <td class="text-right">{{ formatCurrency(item.sumInsured) }}</td>
-              <td class="text-right">{{ item.rate }}‰</td>
-              <td class="text-right">{{ formatCurrency(item.premium) }}</td>
-            </tr>
-            <tr class="bg-grey-2">
-              <td class="text-left text-weight-bold">Total Insured Amount</td>
-              <td class="text-right text-weight-bold">
-                {{ formatCurrency(premiumCalculation.totalSumInsured) }}
-              </td>
-              <td></td>
-              <td class="text-right text-weight-bold">
-                {{ formatCurrency(premiumCalculation.totalPremium) }}
-              </td>
-            </tr>
-            <tr v-if="discountApplied" class="bg-blue-1">
-              <td class="text-left text-weight-bold">Discount Applied</td>
-              <td></td>
-              <td></td>
-              <td class="text-right text-weight-bold text-negative">
-                -{{ formatCurrency(premiumCalculation.discountAmount) }}
-              </td>
-            </tr>
-            <tr v-if="discountApplied" class="bg-grey-2">
-              <td class="text-left text-weight-bold">Final Premium</td>
-              <td></td>
-              <td></td>
-              <td class="text-right text-weight-bold">
-                {{ formatCurrency(premiumCalculation.finalPremium) }}
-              </td>
-            </tr>
-          </tbody>
-        </q-markup-table>
+        <q-card-section>
+          <div class="q-mb-md">
+            <div class="text-subtitle2 q-mb-sm">Type of Cover *</div>
+            <div class="row q-col-gutter-md">
+              <div class="col-12 col-md-6">
+                <q-radio 
+                  v-model="typeOfCover" 
+                  val="Fire" 
+                  label="Fire Insurance"
+                  @update:model-value="handleTypeOfCoverChange"
+                />
+              </div>
+              <div class="col-12 col-md-6">
+                <q-radio 
+                  v-model="typeOfCover" 
+                  val="Miscellaneous" 
+                  label="Miscellaneous"
+                  @update:model-value="handleTypeOfCoverChange"
+                />
+              </div>
+            </div>
+          </div>
 
-        <div v-if="premiumCalculation.additionalCharges" class="q-mt-md">
-          <div class="text-subtitle2">Additional Charges:</div>
-          <ul>
-            <li v-for="(charge, index) in premiumCalculation.additionalCharges" :key="index">
-              {{ charge.description }}: {{ formatCurrency(charge.amount) }}
-            </li>
-          </ul>
-        </div>
-      </q-card-section>
+          <div v-if="typeOfCover === 'Fire'" class="q-mt-md">
+            <div class="text-subtitle2 q-mb-sm">Customer Type *</div>
+            <div class="row q-col-gutter-md">
+              <div class="col-12 col-md-6">
+                <q-radio 
+                  v-model="customerType" 
+                  val="Private" 
+                  label="Private"
+                  @update:model-value="handleCustomerTypeChange"
+                />
+              </div>
+              <div class="col-12 col-md-6">
+                <q-radio 
+                  v-model="customerType" 
+                  val="Commercial" 
+                  label="Commercial"
+                  @update:model-value="handleCustomerTypeChange"
+                />
+              </div>
+            </div>
+          </div>
+        </q-card-section>
+      </q-expansion-item>
     </q-card>
 
-    <div class="bottom q-pa-md">
-      <div class="q-pa-md q-gutter-sm">
-        <q-btn
-          label="Calculate Premium"
-          color="primary"
-          @click="calculatePremium"
-          icon="calculate"
-          :disable="!isReadyForCalculation"
-          :loading="calculating"
-        />
-        <q-btn 
-          label="Submit Request" 
-          color="positive" 
-          @click="submitForm" 
-          icon="send"
-          :loading="submitting"
-          :disable="!premiumCalculation || submitting"
-        />
-        <q-btn 
-          label="Clear Form" 
-          color="grey" 
-          @click="resetForm" 
-          icon="cleaning_services"
-          :disable="submitting"
-        />
-      </div>
-    </div>
+    <q-card v-if="showGeneralInfo" flat bordered class="q-mb-md">
+      <q-expansion-item v-model="expandedSections.generalInfo" expand-icon-toggle header-class="bg-blue-1 text-primary">
+        <template v-slot:header>
+          <q-item-section>
+            <q-item-label class="text-h6">General Information</q-item-label>
+            <q-item-label caption>Customer, broker, and policy details</q-item-label>
+          </q-item-section>
+          <q-item-section side>
+            <q-badge :color="getSectionStatusColor('generalInfo')" :label="getSectionStatusText('generalInfo')" />
+          </q-item-section>
+        </template>
+
+        <q-card-section>
+          <GeneralInformation ref="generalInfoForm" :customer-type="customerType"
+            @validation-changed="handleValidationChange('generalInfo', $event)" />
+        </q-card-section>
+      </q-expansion-item>
+    </q-card>
+
+<q-card v-if="showProductSelection" flat bordered class="q-mb-md">
+  <q-expansion-item v-model="expandedSections.productSelection" expand-icon-toggle
+    header-class="bg-blue-1 text-primary">
+    <template v-slot:header>
+      <q-item-section>
+        <q-item-label class="text-h6">Product Selection</q-item-label>
+        <q-item-label caption>Select insurance product and configure coverage</q-item-label>
+      </q-item-section>
+      <q-item-section side>
+        <q-badge :color="getSectionStatusColor('productSelection')"
+          :label="getSectionStatusText('productSelection')" />
+      </q-item-section>
+    </template>
+
+    <q-card-section>
+      <ProductSelection ref="productSelectionForm" 
+        :customer-type="typeOfCover === 'Fire' ? customerType : 'Miscellaneous'"
+        @validation-changed="handleValidationChange('productSelection', $event)"
+        @product-selected="handleProductSelected" />
+    </q-card-section>
+  </q-expansion-item>
+</q-card>
+    <q-card v-if="showConstructionSection" flat bordered class="q-mb-md">
+      <q-expansion-item v-model="expandedSections.construction" expand-icon-toggle header-class="bg-blue-1 text-primary">
+        <template v-slot:header>
+          <q-item-section>
+            <q-item-label class="text-h6"> Building Construction Details</q-item-label>
+            <q-item-label caption>Construction materials and safety features</q-item-label>
+          </q-item-section>
+          <q-item-section side>
+            <q-badge :color="getSectionStatusColor('construction')" :label="getSectionStatusText('construction')" />
+          </q-item-section>
+        </template>
+
+        <q-card-section>
+          <BuildingDetails ref="buildingConstructionForm"
+            @validation-changed="handleValidationChange('construction', $event)" />
+        </q-card-section>
+      </q-expansion-item>
+    </q-card>
+
+    <!-- <q-card v-if="showCoverRequired" flat bordered class="q-mb-md">
+      <q-expansion-item v-model="expandedSections.coverRequired" expand-icon-toggle
+        header-class="bg-blue-1 text-primary">
+        <template v-slot:header>
+          <q-item-section>
+            <q-item-label class="text-h6">Cover Required</q-item-label>
+            <q-item-label caption>Select insurance product and coverage options</q-item-label>
+          </q-item-section>
+          <q-item-section side>
+            <q-badge :color="getSectionStatusColor('coverRequired')" :label="getSectionStatusText('coverRequired')" />
+          </q-item-section>
+        </template>
+
+        <q-card-section>
+          <CoverRequired ref="coverRequiredForm" :customer-type="customerType" :product-type="selectedProduct"
+            @validation-changed="handleValidationChange('coverRequired', $event)" />
+        </q-card-section>
+      </q-expansion-item>
+    </q-card> -->
+
+    <q-card v-if="showPrivateQuestions" flat bordered class="q-mb-md">
+      <q-expansion-item v-model="expandedSections.privateQuestions" expand-icon-toggle
+        header-class="bg-blue-1 text-primary">
+        <template v-slot:header>
+          <q-item-section>
+            <q-item-label class="text-h6"> Private Questions</q-item-label>
+            <q-item-label caption>Building occupancy and insurance requirements</q-item-label>
+          </q-item-section>
+          <q-item-section side>
+            <q-badge :color="getSectionStatusColor('privateQuestions')"
+              :label="getSectionStatusText('privateQuestions')" />
+          </q-item-section>
+        </template>
+
+        <q-card-section>
+          <PrivateQuestions ref="privateQuestionsForm"
+            @validation-changed="handleValidationChange('privateQuestions', $event)" />
+        </q-card-section>
+      </q-expansion-item>
+    </q-card>
+
+    <q-card v-if="showCommercialQuestions" flat bordered class="q-mb-md">
+      <q-expansion-item v-model="expandedSections.commercialQuestions" expand-icon-toggle
+        header-class="bg-blue-1 text-primary">
+        <template v-slot:header>
+          <q-item-section>
+            <q-item-label class="text-h6"> Commercial Questions</q-item-label>
+            <q-item-label caption>Business information and insurance requirements</q-item-label>
+          </q-item-section>
+          <q-item-section side>
+            <q-badge :color="getSectionStatusColor('commercialQuestions')"
+              :label="getSectionStatusText('commercialQuestions')" />
+          </q-item-section>
+        </template>
+
+        <q-card-section>
+          <CommercialQuestions ref="commercialQuestionsForm"
+            @validation-changed="handleValidationChange('commercialQuestions', $event)" />
+        </q-card-section>
+      </q-expansion-item>
+    </q-card>
+
+    <q-card v-if="showInsuranceConditions" flat bordered class="q-mb-md">
+      <q-expansion-item v-model="expandedSections.insuranceConditions" expand-icon-toggle
+        header-class="bg-blue-1 text-primary">
+        <template v-slot:header>
+          <q-item-section>
+            <q-item-label class="text-h6">Insurance & Claim History</q-item-label>
+            <q-item-label caption>Previous insurance and policy conditions</q-item-label>
+          </q-item-section>
+          <q-item-section side>
+            <q-badge :color="getSectionStatusColor('insuranceConditions')"
+              :label="getSectionStatusText('insuranceConditions')" />
+          </q-item-section>
+        </template>
+
+        <q-card-section>
+          <InsuranceConditions ref="insuranceConditionsForm" :product-type="selectedProduct"
+            :has-solar-panels="hasSolarPanels" :has-loss-of-rent="hasLossOfRent" :has-index-clause="hasIndexClause"
+            @validation-changed="handleValidationChange('insuranceConditions', $event)" />
+        </q-card-section>
+      </q-expansion-item>
+    </q-card>
+<!-- 
+    <q-card flat bordered class="q-mb-md">
+      <q-expansion-item v-model="expandedSections.summary" expand-icon-toggle header-class="bg-blue-1 text-primary"
+        :disable="!showSummary">
+        <template v-slot:header>
+          <q-item-section>
+            <q-item-label class="text-h6"> Summary & Declaration</q-item-label>
+            <q-item-label caption>Review and submit your insurance application</q-item-label>
+          </q-item-section>
+          <q-item-section side>
+            <q-badge :color="getSectionStatusColor('summary')" :label="getSectionStatusText('summary')" />
+          </q-item-section>
+        </template>
+
+        <q-card-section>
+          <Summary ref="summaryRef" :form-data="combinedFormData" :reset-trigger="resetFlag"
+            :premium-calculation="premiumCalculation" :action-data="actionData" />
+        </q-card-section>
+      </q-expansion-item>
+    </q-card>
+
+
+
+    <div class="q-pa-md q-gutter-sm text-center">
+      <q-btn label="Calculate Premium" color="primary" @click="calculatePremium" icon="calculate"
+        :disable="!isReadyForCalculation" :loading="calculating" />
+      <q-btn label="Submit Request" color="positive" @click="submitForm" icon="send" :loading="submitting"
+        :disable="!premiumCalculation || submitting" />
+      <q-btn label="Clear Form" color="grey" @click="resetForm" icon="cleaning_services" :disable="submitting" />
+      
+    </div> -->
   </q-page>
 </template>
 
 <script setup>
-import GeneralInformation from './subForms/GeneralInformation.vue'
-import ProposerInformation from './subForms/ProposerInformation.vue'
-import BuildingConstruction from './subForms/BuildingDetails.vue'
-import CoverRequired from './subForms/CoverRequired.vue'
-import InsuranceAmounts from './subForms/AmountsDescription.vue'
-import Summary from './subForms/SummaryForm.vue'
-import { ref, computed } from 'vue'
+import { ref, reactive, computed, watch} from 'vue'
 import { useQuasar } from 'quasar'
+import ProductSelection from './subForms/ProductSelection.vue'
+import GeneralInformation from './subForms/GeneralInformation.vue'
+import BuildingDetails from './subForms/BuildingDetails.vue'
+import InsuranceConditions from './subForms/InsuranceConditions.vue'
+import CoverRequired from './subForms/CoverRequired.vue'
+import PrivateQuestions from './subForms/PrivateQuestions.vue'
+import CommercialQuestions from './subForms/CommercialQuestions.vue'
+import Summary from './subForms/SummaryForm.vue'
 
 const $q = useQuasar()
 
-const summaryRef = ref(null)
-const proposerInfoForm = ref(null)
-const generalInfoForm = ref(null)
-const buildingConstructionForm = ref(null)
-const coverRequiredForm = ref(null)
-const insuranceAmountsForm = ref(null)
-
+const typeOfCover = ref('')
+const customerType = ref('')
+const selectedProduct = ref('')
 const premiumCalculation = ref(null)
 const formSubmitted = ref(false)
 const submitting = ref(false)
 const calculating = ref(false)
 const resetFlag = ref(false)
+const actionData = ref({})
+
+const generalInfoForm = ref(null)
+const productSelectionForm = ref(null)
+const buildingConstructionForm = ref(null)
+const coverRequiredForm = ref(null)
+const privateQuestionsForm = ref(null)
+const commercialQuestionsForm = ref(null)
+const insuranceConditionsForm = ref(null)
+const summaryRef = ref(null)
+
+const expandedSections = reactive({
+  typeOfCover: true,
+  generalInfo: false,
+  productSelection: false,
+  construction: false,
+  privateQuestions: false,
+  commercialQuestions: false,
+  insuranceConditions: false,
+  summary: false
+})
+
+const sectionValidation = reactive({
+  typeOfCover: false,
+  generalInfo: false,
+  productSelection: false,
+  construction: false,
+  privateQuestions: false,
+  commercialQuestions: false,
+  insuranceConditions: false,
+  summary: false
+})
+
+const isTypeOfCoverValid = computed(() => {
+  if (!typeOfCover.value) return false
+  if (typeOfCover.value === 'Fire' && !customerType.value) return false
+  return true
+})
+
+const showGeneralInfo = computed(() => {
+  return isTypeOfCoverValid.value
+})
+
+const showProductSelection = computed(() => {
+  return showGeneralInfo.value && sectionValidation.generalInfo
+})
+
+const showConstructionSection = computed(() => {
+  return showProductSelection.value && sectionValidation.productSelection
+})
+
+// ELIMINADO: showCoverRequired
+// const showCoverRequired = computed(() => { ... })
+
+// MODIFICADO: Ahora Private Questions se muestra directamente después de Construction
+const showPrivateQuestions = computed(() => {
+  if (customerType.value !== 'Private') return false
+  
+  return showConstructionSection.value && sectionValidation.construction
+})
+
+// MODIFICADO: Ahora Commercial Questions se muestra directamente después de Construction
+const showCommercialQuestions = computed(() => {
+  if (customerType.value !== 'Commercial') return false
+  
+  return showConstructionSection.value && sectionValidation.construction
+})
+
+const showInsuranceConditions = computed(() => {
+  let shouldShow = false
+  
+  if (customerType.value === 'Private') {
+    shouldShow = showPrivateQuestions.value && sectionValidation.privateQuestions
+  } else if (customerType.value === 'Commercial') {
+    shouldShow = showCommercialQuestions.value && sectionValidation.commercialQuestions
+  }
+  
+  return shouldShow
+})
+
+const showSummary = computed(() => {
+  let shouldShow = false
+  
+  if (customerType.value === 'Private') {
+    shouldShow = showInsuranceConditions.value && sectionValidation.insuranceConditions
+  } else if (customerType.value === 'Commercial') {
+    shouldShow = showInsuranceConditions.value && sectionValidation.insuranceConditions
+  }
+  
+  return shouldShow
+})
+
+const handleTypeOfCoverChange = (value) => {
+  if (value === 'Miscellaneous') {
+    customerType.value = ''
+  }
+  
+  sectionValidation.typeOfCover = isTypeOfCoverValid.value
+  
+  if (isTypeOfCoverValid.value) {
+    setTimeout(() => {
+      expandedSections.generalInfo = true
+      showNotification('info', 'Proceeding to General Information')
+    }, 500)
+  }
+}
+
+const handleCustomerTypeChange = (value) => {
+  sectionValidation.typeOfCover = isTypeOfCoverValid.value
+  
+  if (isTypeOfCoverValid.value) {
+    setTimeout(() => {
+      expandedSections.generalInfo = true
+      showNotification('info', 'Proceeding to General Information')
+    }, 500)
+  }
+}
+
+const handleProductSelected = (product) => {
+  selectedProduct.value = product
+}
+
+const handleValidationChange = (section, isValid) => {
+  console.log(`Validation changed for ${section}:`, isValid)
+  
+  sectionValidation[section] = isValid
+  
+  // MODIFICADO: Eliminar referencia a coverRequired
+  const nextSectionMap = {
+    'generalInfo': 'productSelection',
+    'productSelection': 'construction',
+    'construction': () => {
+      if (customerType.value === 'Private') {
+        return 'privateQuestions'
+      } else if (customerType.value === 'Commercial') {
+        return 'commercialQuestions'
+      }
+      return null
+    },
+    'privateQuestions': 'insuranceConditions',
+    'commercialQuestions': 'insuranceConditions',
+    'insuranceConditions': 'summary'
+  }
+  
+  if (isValid) {
+    const nextSection = typeof nextSectionMap[section] === 'function' 
+      ? nextSectionMap[section]() 
+      : nextSectionMap[section]
+    
+    if (nextSection) {
+      setTimeout(() => {
+        expandedSections[nextSection] = true
+        
+        const sectionNames = {
+          'generalInfo': 'General Information',
+          'productSelection': 'Product Selection',
+          'construction': 'Building Construction',
+          'privateQuestions': 'Private Questions',
+          'commercialQuestions': 'Commercial Questions',
+          'insuranceConditions': 'Insurance & Claim History',
+          'summary': 'Summary & Declaration'
+        }
+        
+        showNotification('info', `Proceeding to ${sectionNames[nextSection]}`)
+      }, 800)
+    }
+  }
+}
+
+const getSectionStatusColor = (section) => {
+  return sectionValidation[section] ? 'positive' : 'warning'
+}
+
+const getSectionStatusText = (section) => {
+  return sectionValidation[section] ? 'Complete' : 'Pending'
+}
+
+const showNotification = (type, message) => {
+  $q.notify({
+    type: type,
+    message: message,
+    position: 'top',
+    timeout: 2000
+  })
+}
 
 const combinedFormData = computed(() => ({
-  ...generalInfoForm.value?.formData,
-  ...proposerInfoForm.value?.formData,
-  ...buildingConstructionForm.value?.formData,
-  ...coverRequiredForm.value?.formData,
-  ...insuranceAmountsForm.value?.formData,
+  typeOfCover: typeOfCover.value,
+  customerType: customerType.value,
+  selectedProduct: selectedProduct.value,
+  actionData: actionData.value,
+  ...(generalInfoForm.value?.formData || {}),
+  ...(buildingConstructionForm.value?.formData || {}),
+  ...(privateQuestionsForm.value?.formData || {}),
+  ...(commercialQuestionsForm.value?.formData || {}),
+  ...(insuranceConditionsForm.value?.formData || {})
 }))
 
+// Si aún necesitas estas computed properties, ajusta las referencias
+const hasSolarPanels = computed(() => {
+  // Si aún necesitas esta información, ahora vendría de PrivateQuestions
+  return privateQuestionsForm.value?.formData?.solarPanels === 'Yes'
+})
+
+const hasLossOfRent = computed(() => {
+  return privateQuestionsForm.value?.formData?.lossOfRent === 'Yes'
+})
+
+const hasIndexClause = computed(() => {
+  return privateQuestionsForm.value?.formData?.indexRequired === 'Yes'
+})
+
 const isReadyForCalculation = computed(() => {
-  const data = insuranceAmountsForm.value?.formData
-  return (data?.buildingItems?.length > 0 && Object.keys(data?.buildingAmounts || {}).length > 0) || 
-         (data?.generalContentsItems?.length > 0 && Object.keys(data?.generalContentsAmounts || {}).length > 0)
+  if (customerType.value === 'Private') {
+    const data = privateQuestionsForm.value?.formData
+    return data?.selectedBuildingItems?.length > 0 ||
+      data?.selectedContentsItems?.length > 0 ||
+      data?.selectedHighRiskItems?.length > 0 ||
+      data?.selectedValuablesItems?.length > 0 ||
+      !!data?.otherItemsAmount
+  } else {
+    const data = commercialQuestionsForm.value?.formData
+    return data?.selectedBuildingItems?.length > 0 ||
+      data?.selectedBusinessItems?.length > 0 ||
+      data?.selectedElectronicItems?.length > 0 ||
+      data?.selectedStockItems?.length > 0 ||
+      !!data?.otherItemsAmount
+  }
 })
-
-const discountApplied = computed(() => {
-  return premiumCalculation.value?.discountApplied || false
-})
-
-const formatCurrency = (value) => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 2,
-  }).format(value || 0)
-}
 
 const calculatePremium = async () => {
   calculating.value = true
-  
-  try {
-    if (!validateFormsBeforeCalculation()) {
-      return
-    }
-
-    const amountsData = insuranceAmountsForm.value?.formData
-    if (!amountsData) {
-      showNotification('negative', 'No insurance data', 'Please fill in the insurance amounts', 'error')
-      return
-    }
-
-    console.log('Datos para cálculo:', amountsData) // Debug
-
-    const items = []
-    let totalSumInsured = 0
-    let totalPremium = 0
-
-    if (amountsData.buildingItems?.length > 0) {
-      const buildingSum = amountsData.buildingItems.reduce((sum, item) => {
-        const amount = Number(amountsData.buildingAmounts[item]) || 0
-        return sum + amount
-      }, 0)
-
-      if (buildingSum > 0) {
-        const buildingPremium = (buildingSum / 1000) * 2.5
-        items.push({
-          category: 'Building',
-          sumInsured: buildingSum,
-          rate: '2.50',
-          premium: buildingPremium,
-        })
-        totalSumInsured += buildingSum
-        totalPremium += buildingPremium
-      }
-    }
-
-    if (amountsData.generalContentsItems?.length > 0) {
-      const contentsSum = amountsData.generalContentsItems.reduce((sum, item) => {
-        const amount = Number(amountsData.generalContentsAmounts[item]) || 0
-        return sum + amount
-      }, 0)
-
-      if (contentsSum > 0) {
-        const contentsPremium = (contentsSum / 1000) * 5.5
-        items.push({
-          category: 'General Contents',
-          sumInsured: contentsSum,
-          rate: '5.50',
-          premium: contentsPremium,
-        })
-        totalSumInsured += contentsSum
-        totalPremium += contentsPremium
-      }
-    }
-
-    if (items.length === 0) {
-      showNotification('warning', 'No items to insure', 'Please select at least one item to insure', 'warning')
-      return
-    }
-
-    let discountAmount = 0
-    let finalPremium = totalPremium
-    const shouldApplyDiscount = totalPremium > 1000
-    
-    if (shouldApplyDiscount) {
-      discountAmount = totalPremium * 0.1
-      finalPremium = totalPremium - discountAmount
-    }
-
-    const policyFee = 50
-    const taxes = finalPremium * 0.07
-    const totalAdditionalCharges = policyFee + taxes
-    finalPremium += totalAdditionalCharges
-
-    premiumCalculation.value = {
-      items,
-      totalSumInsured,
-      totalPremium,
-      discountApplied: shouldApplyDiscount,
-      discountAmount,
-      finalPremium,
-      additionalCharges: [
-        {
-          description: 'Policy Fee',
-          amount: policyFee
-        },
-        {
-          description: 'Taxes',
-          amount: taxes
-        }
-      ]
-    }
-
-    showNotification('positive', 'Premium calculated successfully', `Total premium: ${formatCurrency(finalPremium)}`, 'calculate')
-    
-  } catch (error) {
-    console.error('Calculation error:', error)
-    showNotification('negative', 'Calculation failed', 'Please check your inputs and try again', 'error')
-  } finally {
+  setTimeout(() => {
     calculating.value = false
-  }
-}
-
-const validateFormsBeforeCalculation = () => {
-  const forms = [
-    generalInfoForm.value,
-    proposerInfoForm.value,
-    buildingConstructionForm.value,
-    coverRequiredForm.value,
-    insuranceAmountsForm.value
-  ]
-
-  let isValid = true
-  const invalidSections = []
-
-  forms.forEach(form => {
-    if (!form?.validate?.()) {
-      isValid = false
-      const sectionName = form.$el?.querySelector('.q-expansion-item__title')?.textContent || 'Unknown section'
-      invalidSections.push(sectionName)
-    }
-  })
-
-  if (!isValid) {
-    showNotification('warning', 'Form validation errors', 
-      `Please complete these sections:\n${invalidSections.join('\n')}`, 
-      'warning')
-  }
-
-  return isValid
-}
-
-const validateForm = () => {
-  const forms = [
-    { ref: generalInfoForm, name: 'General Information' },
-    { ref: proposerInfoForm, name: 'Proposer Information' },
-    { ref: buildingConstructionForm, name: 'Building Construction' },
-    { ref: coverRequiredForm, name: 'Cover Required' },
-    { ref: insuranceAmountsForm, name: 'Insurance Amounts' }
-  ]
-
-  let isValid = true
-  const invalidSections = []
-
-  forms.forEach(({ ref, name }) => {
-    if (!ref.value?.validate?.()) {
-      isValid = false
-      invalidSections.push(name)
-    }
-  })
-
-  if (!isValid) {
-    showNotification('warning', 'Incomplete form', 
-      `The following sections have errors:\n${invalidSections.join('\n')}`, 
-      'warning')
-  }
-
-  return isValid
+    showNotification('positive', 'Premium calculated successfully')
+  }, 1000)
 }
 
 const submitForm = async () => {
-  if (!premiumCalculation.value) {
-    showNotification('warning', 'Premium not calculated', 'Please calculate premium before submitting', 'warning')
-    return
-  }
-
-  if (!validateForm()) {
-    return
-  }
-
   submitting.value = true
-  
-  try {
-    const formData = {
-      generalInfo: generalInfoForm.value?.formData,
-      proposerInfo: proposerInfoForm.value?.formData,
-      buildingConstruction: buildingConstructionForm.value?.formData,
-      coverRequired: coverRequiredForm.value?.formData,
-      insuranceAmounts: insuranceAmountsForm.value?.formData,
-      premiumCalculation: premiumCalculation.value
-    }
-
-    await new Promise(resolve => setTimeout(resolve, 1500))
-    console.log('Form submission data:', formData)
-    
-    showNotification('positive', 'Request submitted successfully', 
-      `Your reference number is #${Math.floor(1000 + Math.random() * 9000)}`, 
-      'check_circle')
-    
-    formSubmitted.value = true
-    
-  } catch (error) {
-    console.error('Submission error:', error)
-    showNotification('negative', 'Submission failed', 
-      error.message || 'Please try again later', 
-      'error')
-  } finally {
+  setTimeout(() => {
     submitting.value = false
-  }
+    formSubmitted.value = true
+    showNotification('positive', 'Form submitted successfully')
+  }, 1500)
 }
 
-const resetForm = () => {
-  generalInfoForm.value?.resetForm()
-  proposerInfoForm.value?.resetForm()
-  buildingConstructionForm.value?.resetForm()
-  coverRequiredForm.value?.resetForm()
-  insuranceAmountsForm.value?.resetForm()
-  summaryRef.value?.resetForm()
-  
+const resetForm = () => {  
+  typeOfCover.value = ''
+  customerType.value = ''
+  selectedProduct.value = ''
   premiumCalculation.value = null
   formSubmitted.value = false
-  resetFlag.value = true
   
-  setTimeout(() => {
-    resetFlag.value = false
-  }, 100)
+  Object.keys(expandedSections).forEach(key => {
+    expandedSections[key] = false
+  })
+  expandedSections.typeOfCover = true
+  
+  Object.keys(sectionValidation).forEach(key => {
+    sectionValidation[key] = false
+  })
+  
+  const forms = [
+    generalInfoForm,
+    productSelectionForm,
+    buildingConstructionForm,
+    coverRequiredForm,
+    privateQuestionsForm,
+    commercialQuestionsForm,
+    insuranceConditionsForm
+  ]
+  
+  forms.forEach(form => {
+    if (form.value && typeof form.value.resetForm === 'function') {
+      form.value.resetForm()
+    }
+  })
+  
+  showNotification('info', 'Form has been reset')
 }
 
-const showNotification = (type, message, caption = '', icon = '') => {
-  $q.notify({
-    type,
-    message,
-    caption,
-    icon,
-    position: 'top-right',
-    timeout: type === 'negative' ? 5000 : 3000,
-    actions: type === 'positive' ? [{ label: 'OK', color: 'white' }] : undefined
-  })
-}
+watch(isTypeOfCoverValid, (newVal) => {
+  sectionValidation.typeOfCover = newVal
+}, { immediate: true })
+
+// Para debug - verifica los estados de las secciones
+watch(() => ({
+  showInsuranceConditions: showInsuranceConditions.value,
+  privateQuestionsValid: sectionValidation.privateQuestions,
+  commercialQuestionsValid: sectionValidation.commercialQuestions,
+  showPrivateQuestions: showPrivateQuestions.value,
+  showCommercialQuestions: showCommercialQuestions.value
+}), (newVal) => {
+  console.log('Insurance Conditions Debug:', newVal)
+})
 </script>
 
 <style scoped>
 .q-card {
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
 }
 
-.bottom {
-  position: sticky;
-  bottom: 0;
-  background-color: white;
-  z-index: 1;
-  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+.rounded-borders {
+  border-radius: 8px;
 }
 
-.q-field__label span:after {
-  content: " *";
-  color: #f44336;
-}
-
-.error-message {
-  color: #f44336;
-  font-size: 12px;
-  margin-top: 4px;
-}
-
-.required-field .q-field__label:after {
-  content: " *";
-  color: #f44336;
+.q-expansion-item {
+  margin-bottom: 16px;
 }
 </style>
