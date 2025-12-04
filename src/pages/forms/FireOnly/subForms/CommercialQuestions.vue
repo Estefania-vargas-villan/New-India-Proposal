@@ -992,17 +992,13 @@ const maxRemovalDebris = computed(() => {
   return totalSumInsured.value * 0.10 // 10% of TSI
 })
 
-const calculatedLossOfRent = computed(() => {
-  if (!additionalCoverageValues.lossOfRentWeeks) return 0
-  const percentage = Math.min((additionalCoverageValues.lossOfRentWeeks / 52) * 0.05, 0.05)
-  return totalSumInsured.value * percentage
-})
 
-const calculatedRemovalDebris = computed(() => {
-  if (!additionalCoverageValues.removalDebrisPercentage) return 0
-  const percentage = Math.min(additionalCoverageValues.removalDebrisPercentage / 100, 0.10)
-  return totalSumInsured.value * percentage
-})
+
+// const calculatedRemovalDebris = computed(() => {
+//   if (!additionalCoverageValues.removalDebrisPercentage) return 0
+//   const percentage = Math.min(additionalCoverageValues.removalDebrisPercentage / 100, 0.10)
+//   return totalSumInsured.value * percentage
+// })
 
 // Event handlers
 const handleBurglaryCoverChange = (value) => {

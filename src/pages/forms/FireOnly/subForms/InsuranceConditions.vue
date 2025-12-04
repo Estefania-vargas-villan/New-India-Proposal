@@ -345,9 +345,9 @@ const getExcessLabel = (type) => {
     : 'Excess Any Other Perils:'
 }
 
-const getExcessHint = (type) => {
-  return 'AWG. ---------- On each and every claim'
-}
+// const getExcessHint = (type) => {
+//   return 'AWG. ---------- On each and every claim'
+// }
 
 const isFormValid = computed(() => {
   // Previous insurance info if Yes is selected

@@ -527,7 +527,6 @@ const formData = computed(() => ({
   selectedAdditionalCoverages: selectedAdditionalCoverages.value,
   otherItemsDescription: otherItemsDescription.value,
   otherItemsAmount: otherItemsAmount.value,
-  selectedAdditionalCoverages: selectedAdditionalCoverages.value,
   additionalCoverageValues: { ...additionalCoverageValues },
   calculatedLossOfRent: calculatedLossOfRent.value,
   calculatedRemovalDebris: calculatedRemovalDebris.value,
@@ -536,7 +535,6 @@ const formData = computed(() => ({
   contentsAmounts: { ...contentsAmounts },
   highRiskAmounts: { ...highRiskAmounts },
   valuablesAmounts: { ...valuablesAmounts },
-  totalSumInsured: totalSumInsured.value
 }))
 
 defineExpose({

@@ -266,31 +266,27 @@ import ProductSelection from './subForms/ProductSelection.vue'
 import GeneralInformation from './subForms/GeneralInformation.vue'
 import BuildingDetails from './subForms/BuildingDetails.vue'
 import InsuranceConditions from './subForms/InsuranceConditions.vue'
-import CoverRequired from './subForms/CoverRequired.vue'
 import PrivateQuestions from './subForms/PrivateQuestions.vue'
 import CommercialQuestions from './subForms/CommercialQuestions.vue'
-import Summary from './subForms/SummaryForm.vue'
 
 const $q = useQuasar()
 
 const typeOfCover = ref('')
 const customerType = ref('')
 const selectedProduct = ref('')
-const premiumCalculation = ref(null)
+// const premiumCalculation = ref(null)
 const formSubmitted = ref(false)
-const submitting = ref(false)
-const calculating = ref(false)
-const resetFlag = ref(false)
-const actionData = ref({})
+// const submitting = ref(false)
+// const calculating = ref(false)
+// const actionData = ref({})
 
 const generalInfoForm = ref(null)
 const productSelectionForm = ref(null)
 const buildingConstructionForm = ref(null)
-const coverRequiredForm = ref(null)
+// const coverRequiredForm = ref(null)
 const privateQuestionsForm = ref(null)
 const commercialQuestionsForm = ref(null)
 const insuranceConditionsForm = ref(null)
-const summaryRef = ref(null)
 
 const expandedSections = reactive({
   typeOfCover: true,
@@ -361,17 +357,17 @@ const showInsuranceConditions = computed(() => {
   return shouldShow
 })
 
-const showSummary = computed(() => {
-  let shouldShow = false
+// const showSummary = computed(() => {
+//   let shouldShow = false
   
-  if (customerType.value === 'Private') {
-    shouldShow = showInsuranceConditions.value && sectionValidation.insuranceConditions
-  } else if (customerType.value === 'Commercial') {
-    shouldShow = showInsuranceConditions.value && sectionValidation.insuranceConditions
-  }
+//   if (customerType.value === 'Private') {
+//     shouldShow = showInsuranceConditions.value && sectionValidation.insuranceConditions
+//   } else if (customerType.value === 'Commercial') {
+//     shouldShow = showInsuranceConditions.value && sectionValidation.insuranceConditions
+//   }
   
-  return shouldShow
-})
+//   return shouldShow
+// })
 
 const handleTypeOfCoverChange = (value) => {
   if (value === 'Miscellaneous') {
@@ -388,16 +384,16 @@ const handleTypeOfCoverChange = (value) => {
   }
 }
 
-const handleCustomerTypeChange = (value) => {
-  sectionValidation.typeOfCover = isTypeOfCoverValid.value
+// const handleCustomerTypeChange = (value) => {
+//   sectionValidation.typeOfCover = isTypeOfCoverValid.value
   
-  if (isTypeOfCoverValid.value) {
-    setTimeout(() => {
-      expandedSections.generalInfo = true
-      showNotification('info', 'Proceeding to General Information')
-    }, 500)
-  }
-}
+//   if (isTypeOfCoverValid.value) {
+//     setTimeout(() => {
+//       expandedSections.generalInfo = true
+//       showNotification('info', 'Proceeding to General Information')
+//     }, 500)
+//   }
+// }
 
 const handleProductSelected = (product) => {
   selectedProduct.value = product
@@ -467,17 +463,17 @@ const showNotification = (type, message) => {
   })
 }
 
-const combinedFormData = computed(() => ({
-  typeOfCover: typeOfCover.value,
-  customerType: customerType.value,
-  selectedProduct: selectedProduct.value,
-  actionData: actionData.value,
-  ...(generalInfoForm.value?.formData || {}),
-  ...(buildingConstructionForm.value?.formData || {}),
-  ...(privateQuestionsForm.value?.formData || {}),
-  ...(commercialQuestionsForm.value?.formData || {}),
-  ...(insuranceConditionsForm.value?.formData || {})
-}))
+// const combinedFormData = computed(() => ({
+//   typeOfCover: typeOfCover.value,
+//   customerType: customerType.value,
+//   selectedProduct: selectedProduct.value,
+//   actionData: actionData.value,
+//   ...(generalInfoForm.value?.formData || {}),
+//   ...(buildingConstructionForm.value?.formData || {}),
+//   ...(privateQuestionsForm.value?.formData || {}),
+//   ...(commercialQuestionsForm.value?.formData || {}),
+//   ...(insuranceConditionsForm.value?.formData || {})
+// }))
 
 // Si aún necesitas estas computed properties, ajusta las referencias
 const hasSolarPanels = computed(() => {
@@ -493,75 +489,75 @@ const hasIndexClause = computed(() => {
   return privateQuestionsForm.value?.formData?.indexRequired === 'Yes'
 })
 
-const isReadyForCalculation = computed(() => {
-  if (customerType.value === 'Private') {
-    const data = privateQuestionsForm.value?.formData
-    return data?.selectedBuildingItems?.length > 0 ||
-      data?.selectedContentsItems?.length > 0 ||
-      data?.selectedHighRiskItems?.length > 0 ||
-      data?.selectedValuablesItems?.length > 0 ||
-      !!data?.otherItemsAmount
-  } else {
-    const data = commercialQuestionsForm.value?.formData
-    return data?.selectedBuildingItems?.length > 0 ||
-      data?.selectedBusinessItems?.length > 0 ||
-      data?.selectedElectronicItems?.length > 0 ||
-      data?.selectedStockItems?.length > 0 ||
-      !!data?.otherItemsAmount
-  }
-})
+// const isReadyForCalculation = computed(() => {
+//   if (customerType.value === 'Private') {
+//     const data = privateQuestionsForm.value?.formData
+//     return data?.selectedBuildingItems?.length > 0 ||
+//       data?.selectedContentsItems?.length > 0 ||
+//       data?.selectedHighRiskItems?.length > 0 ||
+//       data?.selectedValuablesItems?.length > 0 ||
+//       !!data?.otherItemsAmount
+//   } else {
+//     const data = commercialQuestionsForm.value?.formData
+//     return data?.selectedBuildingItems?.length > 0 ||
+//       data?.selectedBusinessItems?.length > 0 ||
+//       data?.selectedElectronicItems?.length > 0 ||
+//       data?.selectedStockItems?.length > 0 ||
+//       !!data?.otherItemsAmount
+//   }
+// })
 
-const calculatePremium = async () => {
-  calculating.value = true
-  setTimeout(() => {
-    calculating.value = false
-    showNotification('positive', 'Premium calculated successfully')
-  }, 1000)
-}
+// const calculatePremium = async () => {
+//   calculating.value = true
+//   setTimeout(() => {
+//     calculating.value = false
+//     showNotification('positive', 'Premium calculated successfully')
+//   }, 1000)
+// }
 
-const submitForm = async () => {
-  submitting.value = true
-  setTimeout(() => {
-    submitting.value = false
-    formSubmitted.value = true
-    showNotification('positive', 'Form submitted successfully')
-  }, 1500)
-}
+// const submitForm = async () => {
+//   submitting.value = true
+//   setTimeout(() => {
+//     submitting.value = false
+//     formSubmitted.value = true
+//     showNotification('positive', 'Form submitted successfully')
+//   }, 1500)
+// }
 
-const resetForm = () => {  
-  typeOfCover.value = ''
-  customerType.value = ''
-  selectedProduct.value = ''
-  premiumCalculation.value = null
-  formSubmitted.value = false
+// const resetForm = () => {  
+//   typeOfCover.value = ''
+//   customerType.value = ''
+//   selectedProduct.value = ''
+//   premiumCalculation.value = null
+//   formSubmitted.value = false
   
-  Object.keys(expandedSections).forEach(key => {
-    expandedSections[key] = false
-  })
-  expandedSections.typeOfCover = true
+//   Object.keys(expandedSections).forEach(key => {
+//     expandedSections[key] = false
+//   })
+//   expandedSections.typeOfCover = true
   
-  Object.keys(sectionValidation).forEach(key => {
-    sectionValidation[key] = false
-  })
+//   Object.keys(sectionValidation).forEach(key => {
+//     sectionValidation[key] = false
+//   })
   
-  const forms = [
-    generalInfoForm,
-    productSelectionForm,
-    buildingConstructionForm,
-    coverRequiredForm,
-    privateQuestionsForm,
-    commercialQuestionsForm,
-    insuranceConditionsForm
-  ]
+//   const forms = [
+//     generalInfoForm,
+//     productSelectionForm,
+//     buildingConstructionForm,
+//     coverRequiredForm,
+//     privateQuestionsForm,
+//     commercialQuestionsForm,
+//     insuranceConditionsForm
+//   ]
   
-  forms.forEach(form => {
-    if (form.value && typeof form.value.resetForm === 'function') {
-      form.value.resetForm()
-    }
-  })
+//   forms.forEach(form => {
+//     if (form.value && typeof form.value.resetForm === 'function') {
+//       form.value.resetForm()
+//     }
+//   })
   
-  showNotification('info', 'Form has been reset')
-}
+//   showNotification('info', 'Form has been reset')
+// }
 
 watch(isTypeOfCoverValid, (newVal) => {
   sectionValidation.typeOfCover = newVal

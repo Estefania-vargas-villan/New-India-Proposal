@@ -650,13 +650,13 @@ const resetDependentProductFields = () => {
   securityVehicles.value = 'no'
 }
 
-const handleMortgageChange = (value) => {
-  if (value === 'no') {
-    selectedBanks.value = []
-    customBankName.value = ''
-  }
-  emitValidation()
-}
+// const handleMortgageChange = (value) => {
+//   if (value === 'no') {
+//     selectedBanks.value = []
+//     customBankName.value = ''
+//   }
+//   emitValidation()
+// }
 
 const printMortgageDocument = () => {
   const bankNames = getBankDisplayNames()
