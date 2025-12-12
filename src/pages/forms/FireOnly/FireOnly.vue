@@ -9,7 +9,9 @@
             provide accurate information about your building's characteristics, contents, and
             required coverages to correctly calculate your premium.
           </p>
-          <div style="margin: 0 35rem 0 35rem; ">
+
+          <!-- organizar esto para celular  -->
+          <div >
             <q-banner class="  bg-blue-2 text-red-10 q-mb-md shadow-2 " rounded>
               <q-icon name="warning" class="q-mr-sm " />
               Please fill in all fields to continue to the next form.
