@@ -1,12 +1,11 @@
 <template>
   <div>
     <div class="text-h6 text-primary">Step 7: Summary</div>
-    
+
     <q-card flat bordered class="q-mb-md">
       <q-card-section>
         <div class="text-subtitle1 q-mb-sm">Form Overview</div>
-        
-        <!-- Type of Cover -->
+
         <div class="row q-col-gutter-md q-mb-sm">
           <div class="col-12 col-md-6">
             <strong>Type of Cover:</strong> {{ formData.typeOfCover || 'Not specified' }}
@@ -16,19 +15,13 @@
           </div>
         </div>
 
-        <!-- Product Information -->
         <div class="row q-col-gutter-md q-mb-sm" v-if="formData.selectedProduct">
           <div class="col-12">
             <strong>Selected Product:</strong> {{ formData.selectedProduct }}
           </div>
         </div>
 
-        <!-- General Information Summary -->
-        <q-expansion-item
-          label="General Information"
-          icon="info"
-          class="q-mb-sm"
-        >
+        <q-expansion-item label="General Information" icon="info" class="q-mb-sm">
           <q-card>
             <q-card-section>
               <div v-if="formData.customer">
@@ -50,12 +43,7 @@
           </q-card>
         </q-expansion-item>
 
-        <!-- Building Details Summary -->
-        <q-expansion-item
-          label="Building Details"
-          icon="home"
-          class="q-mb-sm"
-        >
+        <q-expansion-item label="Building Details" icon="home" class="q-mb-sm">
           <q-card>
             <q-card-section>
               <div v-if="formData.numberOfStoreys">
@@ -76,12 +64,7 @@
           </q-card>
         </q-expansion-item>
 
-        <!-- Insurance Amounts Summary -->
-        <q-expansion-item
-          label="Insurance Amounts"
-          icon="attach_money"
-          class="q-mb-sm"
-        >
+        <q-expansion-item label="Insurance Amounts" icon="attach_money" class="q-mb-sm">
           <q-card>
             <q-card-section>
               <div v-if="customerType === 'Private'">
@@ -110,32 +93,28 @@
           </q-card>
         </q-expansion-item>
 
-        <!-- Premium Calculation Summary -->
-        <q-expansion-item
-          v-if="premiumCalculation"
-          label="Premium Calculation"
-          icon="calculate"
-        >
+        <q-expansion-item v-if="premiumCalculation" label="Premium Calculation" icon="calculate">
           <q-card>
             <q-card-section>
               <div v-for="item in premiumCalculation.items" :key="item.category" class="q-mb-xs">
-                • {{ item.category }}: {{ formatCurrency(item.sumInsured) }} × {{ item.rate }}‰ = {{ formatCurrency(item.premium) }}
+                • {{ item.category }}: {{ formatCurrency(item.sumInsured) }} × {{ item.rate }}‰ = {{
+                  formatCurrency(item.premium) }}
               </div>
-              
+
               <div class="q-mt-md">
                 <strong>Total Premium:</strong> {{ formatCurrency(premiumCalculation.totalPremium) }}
               </div>
-              
+
               <div v-if="premiumCalculation.discountApplied" class="text-negative">
                 <strong>Discount:</strong> -{{ formatCurrency(premiumCalculation.discountAmount) }}
               </div>
-              
+
               <div v-if="premiumCalculation.additionalCharges">
                 <div v-for="charge in premiumCalculation.additionalCharges" :key="charge.description" class="q-mb-xs">
                   • {{ charge.description }}: {{ formatCurrency(charge.amount) }}
                 </div>
               </div>
-              
+
               <div class="text-h6 q-mt-md text-primary">
                 <strong>Final Premium:</strong> {{ formatCurrency(premiumCalculation.finalPremium) }}
               </div>
@@ -149,57 +128,33 @@
     <q-card flat bordered class="bg-grey-1">
       <q-card-section>
         <div class="text-subtitle1 q-mb-sm">Declaration</div>
-        
-        <q-checkbox
-          v-model="declarationConfirmed"
-          label="I confirm that all information provided is true and accurate to the best of my knowledge"
-        />
-        
-        <q-checkbox
-          v-model="termsAccepted"
-          label="I agree to the terms and conditions of the insurance policy"
-        />
-        
-        <q-checkbox
-          v-model="inspectionAuthorized"
-          label="I authorize inspection of the premises if required"
-        />
+
+        <q-checkbox v-model="declarationConfirmed"
+          label="I confirm that all information provided is true and accurate to the best of my knowledge" />
+
+        <q-checkbox v-model="termsAccepted" label="I agree to the terms and conditions of the insurance policy" />
+
+        <q-checkbox v-model="inspectionAuthorized" label="I authorize inspection of the premises if required" />
 
         <div class="q-mt-md">
-          <q-input
-            v-model="signature"
-            label="Signature"
-            outlined
-            placeholder="Type your full name as signature"
-          />
+          <q-input v-model="signature" label="Signature" outlined placeholder="Type your full name as signature" />
         </div>
       </q-card-section>
     </q-card>
 
     <!-- Action Buttons -->
     <div class="q-mt-md">
-      <q-btn
-        label="Download PDF Summary"
-        color="primary"
-        icon="picture_as_pdf"
-        @click="downloadPDF"
-        :disable="!isFormComplete"
-      />
-      
-      <q-btn
-        label="Print Summary"
-        color="secondary"
-        icon="print"
-        @click="printSummary"
-        class="q-ml-sm"
-        :disable="!isFormComplete"
-      />
+      <q-btn label="Download PDF Summary" color="primary" icon="picture_as_pdf" @click="downloadPDF"
+        :disable="!isFormComplete" />
+
+      <q-btn label="Print Summary" color="secondary" icon="print" @click="printSummary" class="q-ml-sm"
+        :disable="!isFormComplete" />
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, watch,  } from 'vue'
+import { ref, computed, watch, } from 'vue'
 
 const props = defineProps({
   formData: {
@@ -216,43 +171,39 @@ const props = defineProps({
   }
 })
 
-// Declaration state
 const declarationConfirmed = ref(false)
 const termsAccepted = ref(false)
 const inspectionAuthorized = ref(false)
 const signature = ref('')
 
-// Computed properties
 const customerType = computed(() => props.formData.customerType || 'Private')
 
 const totalSumInsured = computed(() => {
   let total = 0
-  
+
   if (customerType.value === 'Private') {
-    // Sum private insurance amounts
     props.formData.buildingItems?.forEach(item => {
       total += Number(props.formData.buildingAmounts?.[item]) || 0
     })
-    
+
     props.formData.generalContentsItems?.forEach(item => {
       total += Number(props.formData.generalContentsAmounts?.[item]) || 0
     })
   } else {
-    // Sum commercial insurance amounts
     props.formData.buildingItems?.forEach(item => {
       total += Number(props.formData.buildingAmounts?.[item]) || 0
     })
   }
-  
+
   return total
 })
 
 const isFormComplete = computed(() => {
-  return declarationConfirmed.value && 
-         termsAccepted.value && 
-         inspectionAuthorized.value && 
-         signature.value.trim() !== '' &&
-         totalSumInsured.value > 0
+  return declarationConfirmed.value &&
+    termsAccepted.value &&
+    inspectionAuthorized.value &&
+    signature.value.trim() !== '' &&
+    totalSumInsured.value > 0
 })
 
 // Item label mappings
@@ -289,7 +240,6 @@ const itemLabels = {
   }
 }
 
-// Methods
 const formatCurrency = (value) => {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
@@ -303,9 +253,7 @@ const getItemLabel = (itemKey, category) => {
 }
 
 const downloadPDF = () => {
-  // Implement PDF download logic
   console.log('Downloading PDF summary...')
-  // This would typically generate and download a PDF file
 }
 
 const printSummary = () => {
@@ -319,14 +267,12 @@ const resetForm = () => {
   signature.value = ''
 }
 
-// Watch for reset trigger
 watch(() => props.resetTrigger, (newVal) => {
   if (newVal) {
     resetForm()
   }
 })
 
-// Expose methods to parent
 defineExpose({
   resetForm
 })
@@ -337,7 +283,7 @@ defineExpose({
   .q-btn {
     display: none !important;
   }
-  
+
   .q-expansion-item__content {
     display: block !important;
   }

@@ -1,35 +1,25 @@
 <template>
-  <div class="step1-container">
-    <!-- Cliente Existente o Nuevo -->
+  <div>
     <div class="q-mb-md">
-      <div class="text-subtitle2 q-mb-sm">1a) Existing Customer? *</div>
+      <div class="text-subtitle2 q-mb-sm">Existing Customer? *</div>
       <div class="row q-col-gutter-md">
-        <div class="col-12 col-md-6">
-          <q-radio 
-            v-model="existingCustomer" 
-            val="yes" 
-            label="Yes"
-            @update:model-value="handleExistingCustomerChange"
-          />
+        <div class="col-12 col-md-4">
+          <q-radio v-model="existingCustomer" val="yes" label="Yes"
+            @update:model-value="handleExistingCustomerChange" />
         </div>
         <div class="col-12 col-md-6">
-          <q-radio 
-            v-model="existingCustomer" 
-            val="no" 
-            label="No"
-            @update:model-value="handleExistingCustomerChange"
-          />
+          <q-radio v-model="existingCustomer" val="no" label="No" @update:model-value="handleExistingCustomerChange" />
         </div>
       </div>
     </div>
 
-    <!-- Select Customer (solo si existingCustomer = 'yes') -->
     <div v-if="existingCustomer === 'yes'" class="q-mb-md">
       <div class="text-subtitle2 q-mb-sm">Select Existing Customer *</div>
       <q-select ref="customerSelectRef" v-model="selectedCustomer" :options="filteredCustomers"
         label="Type customer name to search" use-input outlined emit-value map-options option-label="fullName"
         option-value="id" @filter="filterCustomers" @update:model-value="handleCustomerSelect"
-        @clear="handleClearCustomer" clearable :rules="existingCustomer === 'yes' ? [val => !!val || 'Customer selection is required'] : []">
+        @clear="handleClearCustomer" clearable
+        :rules="existingCustomer === 'yes' ? [val => !!val || 'Customer selection is required'] : []">
         <template v-slot:option="scope">
           <q-item v-bind="scope.itemProps">
             <q-item-section>
@@ -48,7 +38,6 @@
       </q-select>
     </div>
 
-    <!-- Create New Customer (solo si existingCustomer = 'no') -->
     <div v-if="existingCustomer === 'no'" class="q-mb-md">
       <q-card class="q-mt-md bg-blue-1">
         <q-card-section>
@@ -56,14 +45,13 @@
           <div class="text-caption text-grey q-mb-sm">
             Customer ID will be auto-generated upon creation
           </div>
-          
+
           <q-form @submit="createNewCustomer" class="q-gutter-md">
-            <!-- Campos existentes -->
             <q-input v-model="newCustomer.fullName" label="Name of proposer (in full) *" outlined
               :rules="[val => !!val || 'Full name is required']" />
-            <q-input v-model="newCustomer.fullMailingAddress" label="Full mailing address *" outlined type="textarea" rows="2"
-              :rules="[val => !!val || 'Mailing address is required']" />
-            
+            <q-input v-model="newCustomer.fullMailingAddress" label="Full mailing address *" outlined type="textarea"
+              rows="2" :rules="[val => !!val || 'Mailing address is required']" />
+
             <div class="row q-col-gutter-md">
               <div class="col-12 col-md-6">
                 <q-input v-model="newCustomer.homeOrWorkTel" label="Home/Work Tel # *" outlined
@@ -77,7 +65,7 @@
 
             <q-input v-model="newCustomer.email" label="Email *" outlined type="email"
               :rules="[val => !!val || 'Email is required']" />
-            
+
             <div class="row q-col-gutter-md">
               <div class="col-12 col-md-6">
                 <q-input v-model="newCustomer.persoonsNumber" label="Persoons #" outlined />
@@ -93,10 +81,10 @@
               <div class="text-caption text-grey q-mb-sm">
                 (Which cannot be before the proposal is accepted by the company)
               </div>
-              
+
               <div class="row q-col-gutter-md">
                 <div class="col-12 col-md-4">
-                  <q-select v-model="newCustomer.insurancePeriodMonths" :options="insurancePeriodOptions" 
+                  <q-select v-model="newCustomer.insurancePeriodMonths" :options="insurancePeriodOptions"
                     label="Months *" outlined emit-value map-options
                     :rules="[val => !!val || 'Insurance period is required']" />
                 </div>
@@ -138,9 +126,10 @@
             <div class="premises-section q-mt-lg">
               <div class="text-subtitle2 q-mb-sm">Location of Premises Proposed for Insurance</div>
               <div class="text-caption text-grey q-mb-sm">
-                (Any change of location after the proposal is submitted, must be brought to the notice of the insurance company immediately)
+                (Any change of location after the proposal is submitted, must be brought to the notice of the insurance
+                company immediately)
               </div>
-              
+
               <q-input v-model="newCustomer.premisesSituation" label="Situation *" outlined type="textarea" rows="3"
                 hint="Give full address, i.e. name of building, street, town, etc"
                 :rules="[val => !!val || 'Premises situation is required']" />
@@ -154,44 +143,31 @@
       </q-card>
     </div>
 
-    <!-- Broker Selection -->
     <div class="q-mb-md">
-      <div class="text-subtitle2 q-mb-sm">1b) Select Broker *</div>
+      <div class="text-subtitle2 q-mb-sm">1Select Broker *</div>
       <q-select v-model="selectedBroker" :options="brokerOptions" label="Select broker" outlined emit-value map-options
         option-label="label" option-value="value" :rules="[val => !!val || 'Broker selection is required']" />
     </div>
 
-    <!-- Account Code -->
     <div class="q-mb-md">
-      <div class="text-subtitle2 q-mb-sm">1c) Select On Account Code (if applicable)</div>
+      <div class="text-subtitle2 q-mb-sm">Select On Account Code (if applicable)</div>
       <q-select v-model="selectedAccountCode" :options="accountCodeOptions" label="Select account code" outlined
         emit-value map-options option-label="label" option-value="value"
         @update:model-value="handleAccountCodeChange" />
     </div>
 
-    <!-- ============================================= -->
-    <!-- Policy Period (PRIMERO) -->
-    <!-- ============================================= -->
+
     <div class="q-mb-md">
-      <div class="text-subtitle2 q-mb-sm">1d) Policy Period *</div>
-      
-      <!-- Radios para Policy Period -->
+      <div class="text-subtitle2 q-mb-sm">Policy Period *</div>
+
       <div class="row q-col-gutter-md q-mb-md">
         <div class="col-12 col-md-4">
-          <q-radio 
-            v-model="selectedPolicyPeriod" 
-            val="1_YEAR" 
-            label="1 Year"
-            @update:model-value="handlePolicyPeriodChange"
-          />
+          <q-radio v-model="selectedPolicyPeriod" val="1_YEAR" label="1 Year"
+            @update:model-value="handlePolicyPeriodChange" />
         </div>
         <div class="col-12 col-md-4">
-          <q-radio 
-            v-model="selectedPolicyPeriod" 
-            val="6_MONTHS" 
-            label="6 Months"
-            @update:model-value="handlePolicyPeriodChange"
-          />
+          <q-radio v-model="selectedPolicyPeriod" val="6_MONTHS" label="6 Months"
+            @update:model-value="handlePolicyPeriodChange" />
         </div>
         <!-- <div class="col-12 col-md-4">
           <q-radio 
@@ -203,24 +179,16 @@
         </div> -->
       </div>
 
-      <!-- Fechas del Policy Period para todos los radios -->
       <div v-if="selectedPolicyPeriod" class="q-mb-md">
         <div class="row q-col-gutter-md">
           <div class="col-12 col-md-6">
-            <q-input 
-              v-model="policyPeriodStartDate" 
-              label="Start Date *" 
-              outlined 
-              :rules="[val => !!val || 'Start date is required']"
-            >
+            <q-input v-model="policyPeriodStartDate" label="Start Date *" outlined
+              :rules="[val => !!val || 'Start date is required']">
               <template v-slot:append>
                 <q-icon name="event" class="cursor-pointer">
                   <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                    <q-date 
-                      v-model="policyPeriodStartDate" 
-                      mask="YYYY-MM-DD"
-                      @update:model-value="handlePolicyDateChange('start')"
-                    >
+                    <q-date v-model="policyPeriodStartDate" mask="YYYY-MM-DD"
+                      @update:model-value="handlePolicyDateChange('start')">
                       <div class="row items-center justify-end">
                         <q-btn v-close-popup label="Close" color="primary" flat />
                       </div>
@@ -231,20 +199,13 @@
             </q-input>
           </div>
           <div class="col-12 col-md-6">
-            <q-input 
-              v-model="policyPeriodEndDate" 
-              label="End Date *" 
-              outlined 
-              :rules="[val => !!val || 'End date is required']"
-            >
+            <q-input v-model="policyPeriodEndDate" label="End Date *" outlined
+              :rules="[val => !!val || 'End date is required']">
               <template v-slot:append>
                 <q-icon name="event" class="cursor-pointer">
                   <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                    <q-date 
-                      v-model="policyPeriodEndDate" 
-                      mask="YYYY-MM-DD"
-                      @update:model-value="handlePolicyDateChange('end')"
-                    >
+                    <q-date v-model="policyPeriodEndDate" mask="YYYY-MM-DD"
+                      @update:model-value="handlePolicyDateChange('end')">
                       <div class="row items-center justify-end">
                         <q-btn v-close-popup label="Close" color="primary" flat />
                       </div>
@@ -257,7 +218,6 @@
         </div>
       </div>
 
-      <!-- Covernote Section para New Part Payment -->
       <div v-if="selectedAccountCode === 'NEW_PART_PAYMENT'" class="q-mt-md bg-yellow-1 q-pa-md rounded-borders">
         <div class="text-subtitle2 q-mb-sm">Grant covernote for 1 month</div>
         <div class="text-caption text-grey q-mb-sm">
@@ -289,11 +249,9 @@
       </div> -->
     </div>
 
-    <!-- ============================================= -->
-    <!-- Invoice Date (SEGUNDO) -->
-    <!-- ============================================= -->
+
     <div class="q-mb-md">
-      <div class="text-subtitle2 q-mb-sm">1e) Invoice Date *</div>
+      <div class="text-subtitle2 q-mb-sm">Invoice Date *</div>
       <q-input v-model="invoiceDate" label="Invoice Date" outlined
         :rules="[val => !!val || 'Invoice date is required']">
         <template v-slot:append>
@@ -324,7 +282,6 @@ const props = defineProps({
   }
 })
 
-// Variables principales
 const existingCustomer = ref(null)
 const selectedCustomer = ref(null)
 const selectedBroker = ref(null)
@@ -337,12 +294,10 @@ const covernoteStartDate = ref(null)
 const covernoteEndDate = ref(null)
 const quarterlyConfirmed = ref(false)
 
-// Variables para crear nuevo cliente
 const savingCustomer = ref(false)
 const filteredCustomers = ref([])
 const customerSelectRef = ref(null)
 
-// Opciones
 const insurancePeriodOptions = [
   { label: '1 Month', value: 1 },
   { label: '3 Months', value: 3 },
@@ -364,7 +319,6 @@ const accountCodeOptions = [
   { label: 'Corporate Account', value: 'CORPORATE' }
 ]
 
-// Mock data de clientes
 const mockCustomers = [
   {
     id: 1,
@@ -398,7 +352,6 @@ const mockCustomers = [
   }
 ]
 
-// Datos para nuevo cliente
 const newCustomer = reactive({
   fullName: '',
   fullMailingAddress: '',
@@ -413,39 +366,30 @@ const newCustomer = reactive({
   premisesSituation: ''
 })
 
-// Computed properties
 const isStepValid = computed(() => {
-  // Validar si se seleccionó si el cliente existe o no
   if (!existingCustomer.value) return false
-  
-  // Validar cliente
+
   if (existingCustomer.value === 'yes' && !selectedCustomer.value) return false
   if (existingCustomer.value === 'no' && !newCustomer.fullName) return false
-  
-  // Validar campos obligatorios
+
   const baseValidation = selectedBroker.value &&
     invoiceDate.value
-  
+
   if (!baseValidation) return false
-  
-  // Validar Policy Period
+
   if (!selectedPolicyPeriod.value) return false
-  
-  // Validar fechas del Policy Period
+
   if (!policyPeriodStartDate.value || !policyPeriodEndDate.value) return false
-  
-  // Validar confirmación quarterly
+
   if (selectedPolicyPeriod.value === 'QUARTERLY' && !quarterlyConfirmed.value) return false
-  
-  // Validar covernote si se seleccionó New Part Payment
+
   if (selectedAccountCode.value === 'NEW_PART_PAYMENT') {
     if (!covernoteStartDate.value || !covernoteEndDate.value) return false
   }
-  
+
   return true
 })
 
-// Watchers
 watch(isStepValid, (newVal) => {
   emit('validation-changed', newVal)
 }, { immediate: true })
@@ -472,18 +416,15 @@ watch(() => ({
   emit('update:modelValue', newVal)
 }, { deep: true, immediate: true })
 
-// Methods
 const handleExistingCustomerChange = (value) => {
   console.log('Existing customer selection:', value)
-  
+
   if (value === 'yes') {
-    // Reset new customer form
     Object.keys(newCustomer).forEach(key => {
       newCustomer[key] = ''
     })
     filteredCustomers.value = [...mockCustomers]
   } else if (value === 'no') {
-    // Reset selected customer
     selectedCustomer.value = null
   }
 }
@@ -504,7 +445,6 @@ const filterCustomers = (val, update) => {
 const handleCustomerSelect = (customer) => {
   console.log('Customer selected:', customer)
   if (customer) {
-    // Auto-fill invoice date if not set
     if (!invoiceDate.value) {
       invoiceDate.value = new Date().toISOString().split('T')[0]
     }
@@ -517,28 +457,25 @@ const handleClearCustomer = () => {
 
 const handlePolicyPeriodChange = (policyPeriod) => {
   console.log('Policy period selected:', policyPeriod)
-  
-  // Reset quarterly confirmation si no es QUARTERLY
+
   if (policyPeriod !== 'QUARTERLY') {
     quarterlyConfirmed.value = false
   }
-  
-  // Establecer fecha de inicio por defecto si no está establecida
+
   if (!policyPeriodStartDate.value) {
     policyPeriodStartDate.value = new Date().toISOString().split('T')[0]
   }
-  
-  // Calcular fecha de fin según el periodo seleccionado
+
   calculatePolicyEndDate(policyPeriod)
 }
 
 const calculatePolicyEndDate = (period) => {
   if (!policyPeriodStartDate.value) return
-  
+
   const startDate = new Date(policyPeriodStartDate.value)
   let endDate = new Date(startDate)
-  
-  switch(period) {
+
+  switch (period) {
     case '1_YEAR':
       endDate.setFullYear(startDate.getFullYear() + 1)
       break
@@ -549,17 +486,15 @@ const calculatePolicyEndDate = (period) => {
       endDate.setMonth(startDate.getMonth() + 3)
       break
   }
-  
-  // Restar un día para que sea hasta el final del día anterior
+
   endDate.setDate(endDate.getDate() - 1)
-  
+
   policyPeriodEndDate.value = endDate.toISOString().split('T')[0]
 }
 
 const handlePolicyDateChange = (type) => {
   console.log(`${type} date changed:`, type === 'start' ? policyPeriodStartDate.value : policyPeriodEndDate.value)
-  
-  // Si se cambia la fecha de inicio, recalcular la fecha de fin según el periodo seleccionado
+
   if (type === 'start' && selectedPolicyPeriod.value) {
     calculatePolicyEndDate(selectedPolicyPeriod.value)
   }
@@ -567,12 +502,10 @@ const handlePolicyDateChange = (type) => {
 
 const handleAccountCodeChange = (accountCode) => {
   console.log('Account code selected:', accountCode)
-  
-  // Si se selecciona New Part Payment, sugerir fechas de covernote
+
   if (accountCode === 'NEW_PART_PAYMENT') {
     suggestCovernoteDates()
   } else {
-    // Si se cambia a otra opción, limpiar covernote
     covernoteStartDate.value = null
     covernoteEndDate.value = null
   }
@@ -592,26 +525,25 @@ const suggestCovernoteDates = () => {
 }
 
 const createNewCustomer = async () => {
-  // Validar campos requeridos
-  const requiredFields = ['fullName', 'fullMailingAddress', 'homeOrWorkTel', 
-                         'cellMobile', 'email', 'businessProfession',
-                         'insurancePeriodMonths', 'insuranceDateFrom', 
-                         'insuranceDateUntil', 'premisesSituation']
-  
+  const requiredFields = ['fullName', 'fullMailingAddress', 'homeOrWorkTel',
+    'cellMobile', 'email', 'businessProfession',
+    'insurancePeriodMonths', 'insuranceDateFrom',
+    'insuranceDateUntil', 'premisesSituation']
+
   for (const field of requiredFields) {
     if (!newCustomer[field]) {
       console.error(`Field ${field} is required`)
       return
     }
   }
-  
+
   savingCustomer.value = true
-  
+
   try {
     await new Promise(resolve => setTimeout(resolve, 1000))
-    
+
     const newCustomerCode = `CUST${String(mockCustomers.length + 1).padStart(3, '0')}`
-    
+
     const newCustomerObj = {
       id: mockCustomers.length + 1,
       code: newCustomerCode,
@@ -627,21 +559,19 @@ const createNewCustomer = async () => {
       insuranceDateUntil: newCustomer.insuranceDateUntil,
       premisesSituation: newCustomer.premisesSituation
     }
-    
+
     mockCustomers.push(newCustomerObj)
     filteredCustomers.value = [...mockCustomers]
-    
-    // Seleccionar el nuevo cliente automáticamente
+
     selectedCustomer.value = newCustomerObj
     existingCustomer.value = 'yes'
-    
-    // Limpiar formulario
+
     Object.keys(newCustomer).forEach(key => {
       newCustomer[key] = ''
     })
-    
+
     console.log('New customer created:', newCustomerObj)
-    
+
   } catch (error) {
     console.error('Error creating customer:', error)
   } finally {
@@ -665,7 +595,7 @@ const resetForm = () => {
   covernoteStartDate.value = null
   covernoteEndDate.value = null
   quarterlyConfirmed.value = false
-  
+
   Object.keys(newCustomer).forEach(key => {
     newCustomer[key] = ''
   })
@@ -674,7 +604,6 @@ const resetForm = () => {
 const today = new Date()
 invoiceDate.value = today.toISOString().split('T')[0]
 
-// Watch for prop changes
 watch(() => props.modelValue, (newVal) => {
   if (newVal.existingCustomer) existingCustomer.value = newVal.existingCustomer
   if (newVal.customer) selectedCustomer.value = newVal.customer
@@ -728,7 +657,6 @@ defineExpose({
   padding: 8px 0;
 }
 
-/* Estilos para los radios más simples */
 .q-radio {
   margin-bottom: 8px;
 }

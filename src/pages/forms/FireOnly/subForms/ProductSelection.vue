@@ -1,20 +1,18 @@
 <template>
-  <div class="product-selection-container">
+  <div >
     <div class="text-h6 text-primary q-mb-md">
-      {{ isMiscellaneous ? 'Step 4 - Select Insurance Cover' : 'Step 2 - Product Selection' }}
+      {{ isMiscellaneous ? ' Select Insurance Cover' : ' Product Selection' }}
     </div>
 
-    <!-- Select Insurance Cover (NUMBERING CHANGES BASED ON TYPE) -->
     <div class="q-mb-lg">
       <div class="text-subtitle2 q-mb-sm">
-        {{ isMiscellaneous ? '4) Select Insurance Cover *' : '2a) Select Product *' }}
+        {{ isMiscellaneous ? 'Select Insurance Cover *' : 'Select Product *' }}
       </div>
       <q-select v-model="selectedProduct" :options="filteredProductOptions" label="Select insurance product" outlined 
         emit-value map-options option-label="label" option-value="value" @update:model-value="handleProductChange"
         :rules="[val => !!val || 'Product selection is required']" />
     </div>
 
-    <!-- Public Liability Sub-options (SOLO PARA PLC) -->
     <div v-if="selectedProduct === 'PLC'" class="q-mb-lg bg-blue-1 q-pa-md rounded-borders">
       <div class="text-subtitle2 q-mb-sm">Public Liability Type *</div>
       <div class="row q-col-gutter-md">
@@ -23,7 +21,6 @@
         </div>
       </div>
       
-      <!-- Additional info for each type -->
       <div v-if="selectedPublicLiabilityType" class="q-mt-md">
         <div class="text-caption text-grey">
           <q-icon name="info" size="sm" />
@@ -35,19 +32,17 @@
       </div>
     </div>
 
-    <!-- Location of Premises Proposed for Insurance -->
     <div class="q-mb-lg">
       <div class="text-subtitle2 q-mb-sm">
-        {{ isMiscellaneous ? '5) Location of Premises Proposed for Insurance *' : '2b) Location of Premises Proposed for Insurance *' }}
+        {{ isMiscellaneous ? 'Location of Premises Proposed for Insurance *' : 'Location of Premises Proposed for Insurance *' }}
       </div>
       <q-input v-model="premisesLocation" label="Risk Address *" outlined type="textarea" rows="2"
         :rules="[val => !!val || 'Premises location is required']"
         placeholder="Enter the complete address of the property/location to be insured" />
     </div>
 
-    <!-- Mortgage Clause (SOLO PARA FIRE, NO PARA MISCELLANEOUS) -->
     <div v-if="!isMiscellaneous" class="q-mb-lg">
-      <div class="text-subtitle2 q-mb-sm">2c) Mortgage Clause Required *</div>
+      <div class="text-subtitle2 q-mb-sm">Mortgage Clause Required *</div>
 
       <div class="row q-col-gutter-md q-mb-md">
         <div class="col-12 col-sm-6">
@@ -58,7 +53,6 @@
         </div>
       </div>
 
-      <!-- Bank selection for mortgage clause -->
       <div v-if="mortgageRequired === 'yes'" class="bank-selection-section bg-grey-2 q-pa-md rounded-borders">
         <div class="text-subtitle2 q-mb-sm">Select Banks* (Multiple selection allowed)</div>
 
@@ -73,7 +67,6 @@
             placeholder="Enter bank name not listed above" :rules="[val => !!val || 'Bank name is required']" />
         </div>
 
-        <!-- Mortgage Document Preview -->
         <div v-if="selectedBanks.length > 0" class="mortgage-document-preview q-mt-md bg-blue-1 q-pa-md rounded-borders">
           <div class="text-subtitle2 q-mb-sm">Mortgage Clause Document Preview</div>
           <div class="document-content">
@@ -96,13 +89,11 @@
       </div>
     </div>
 
-    <!-- Product Specific Questions (DIFFERENT FOR FIRE VS MISCELLANEOUS) -->
     <div v-if="selectedProduct && !isMiscellaneous" class="product-questions-section">
       <div class="text-h6 text-primary q-mb-md">Product Specific Questions</div>
 
-      <!-- Existing Fire product questions -->
       <div class="q-mb-lg">
-        <div class="text-subtitle2 q-mb-sm">6a) Owner or Tenant *</div>
+        <div class="text-subtitle2 q-mb-sm"> Owner or Tenant *</div>
         <q-select v-model="ownerTenant" :options="ownerTenantOptions" label="Select option" outlined
           :rules="[val => !!val || 'This field is required']" />
       </div>
@@ -114,7 +105,7 @@
       </div>
 
       <div class="q-mb-lg">
-        <div class="text-subtitle2 q-mb-sm">6b + c) Property Usage *</div>
+        <div class="text-subtitle2 q-mb-sm"> Property Usage *</div>
 
         <div class="row q-col-gutter-md">
           <div class="col-12 col-md-4">
@@ -242,87 +233,8 @@
       </div>
     </div>
 
-    <!-- Product Specific Questions for MISCELLANEOUS -->
     <div v-if="selectedProduct && isMiscellaneous" class="miscellaneous-questions-section">
       <div class="text-h6 text-primary q-mb-md">Product Specific Details</div>
-
-      <!-- Questions specific to each miscellaneous product -->
-      <div v-if="selectedProduct === 'BUHU'" class="q-mb-lg bg-green-1 q-pa-md rounded-borders">
-        <div class="text-subtitle2 q-mb-sm">Burglary Hold Up Details</div>
-        
-        <div class="row q-col-gutter-md">
-          <div class="col-12 col-md-6">
-            <q-input v-model="securityMeasures" label="Security Measures *" outlined
-              placeholder="Describe security measures in place" 
-              :rules="[val => !!val || 'Security measures are required']" />
-          </div>
-          <div class="col-12 col-md-6">
-            <q-input v-model="maxCashOnPremises" label="Maximum Cash on Premises (AWG) *" outlined type="number"
-              prefix="AWG" :rules="[val => val > 0 || 'Cash amount must be greater than 0']" />
-          </div>
-        </div>
-        
-        <div class="row q-col-gutter-md q-mt-md">
-          <div class="col-12 col-md-6">
-            <div class="text-subtitle2 q-mb-sm">Previous Break-ins? *</div>
-            <q-radio-group v-model="previousBreakIns" inline>
-              <q-radio val="yes" label="Yes" />
-              <q-radio val="no" label="No" class="q-ml-md" />
-            </q-radio-group>
-          </div>
-          <div class="col-12 col-md-6" v-if="previousBreakIns === 'yes'">
-            <q-input v-model="breakInDetails" label="Details of previous break-ins" outlined />
-          </div>
-        </div>
-      </div>
-
-      <div v-if="selectedProduct === 'CAR'" class="q-mb-lg bg-orange-1 q-pa-md rounded-borders">
-        <div class="text-subtitle2 q-mb-sm">Contractors All Risk Details</div>
-        
-        <div class="row q-col-gutter-md">
-          <div class="col-12 col-md-6">
-            <q-input v-model="contractValue" label="Contract Value (AWG) *" outlined type="number" prefix="AWG"
-              :rules="[val => val > 0 || 'Contract value is required']" />
-          </div>
-          <div class="col-12 col-md-6">
-            <q-input v-model="contractDuration" label="Contract Duration (months) *" outlined type="number"
-              :rules="[val => val > 0 || 'Contract duration is required']" />
-          </div>
-        </div>
-        
-        <div class="q-mt-md">
-          <q-input v-model="contractDescription" label="Project Description *" outlined type="textarea" rows="2"
-            :rules="[val => !!val || 'Project description is required']" />
-        </div>
-      </div>
-
-      <div v-if="selectedProduct === 'MIT'" class="q-mb-lg bg-purple-1 q-pa-md rounded-borders">
-        <div class="text-subtitle2 q-mb-sm">Money in Transit Details</div>
-        
-        <div class="row q-col-gutter-md">
-          <div class="col-12 col-md-6">
-            <q-input v-model="maxTransitAmount" label="Maximum Amount in Transit (AWG) *" outlined type="number"
-              prefix="AWG" :rules="[val => val > 0 || 'Amount is required']" />
-          </div>
-          <div class="col-12 col-md-6">
-            <q-input v-model="transitFrequency" label="Frequency of Transfers *" outlined
-              placeholder="e.g., Daily, Weekly, Monthly" 
-              :rules="[val => !!val || 'Frequency is required']" />
-          </div>
-        </div>
-        
-        <div class="q-mt-md">
-          <div class="text-subtitle2 q-mb-sm">Security Vehicles Used? *</div>
-          <q-radio-group v-model="securityVehicles" inline>
-            <q-radio val="yes" label="Yes" />
-            <q-radio val="no" label="No" class="q-ml-md" />
-          </q-radio-group>
-        </div>
-      </div>
-
-      <!-- Add more product-specific sections as needed -->
-
-      <!-- Product Information Display -->
       <div class="q-mt-lg bg-grey-2 q-pa-md rounded-borders">
         <div class="text-subtitle2 q-mb-sm">Product Information: {{ selectedProductInfo.name }}</div>
         <div class="text-caption">{{ selectedProductInfo.description }}</div>
@@ -333,14 +245,18 @@
           </ul>
         </div>
       </div>
+
+     
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, watch, defineEmits, defineProps } from 'vue'
+import { Notify } from 'quasar'
 
 const emit = defineEmits(['update:modelValue', 'validation-changed', 'product-selected'])
+
 
 const props = defineProps({
   modelValue: {
@@ -350,15 +266,17 @@ const props = defineProps({
   customerType: {
     type: String,
     default: ''
+  },
+  typeOfCover: {
+    type: String,
+    default: ''
   }
 })
 
-// Computed property to check if this is Miscellaneous
 const isMiscellaneous = computed(() => {
-  return props.customerType.toLowerCase() === 'miscellaneous'
+  return props.typeOfCover === 'Miscellaneous'
 })
 
-// Product Options for Miscellaneous
 const miscellaneousProductOptions = [
   { label: 'Burglary hold up (BUHU)', value: 'BUHU' },
   { label: 'Burglary (BUR)', value: 'BUR' },
@@ -374,7 +292,6 @@ const miscellaneousProductOptions = [
   { label: 'Personal liability individual (PLI)', value: 'PLI' }
 ]
 
-// Public Liability Sub-options
 const publicLiabilityOptions = [
   { label: 'Public Liability Premises', value: 'premises' },
   { label: 'Public Liability Operations', value: 'operations' },
@@ -399,7 +316,6 @@ const allProductOptions = {
   miscellaneous: miscellaneousProductOptions
 }
 
-// Product Info (combining both Fire and Miscellaneous)
 const productInfo = {
   // Fire products
   FIR: { name: 'Fire Only (FIR)', description: 'Basic fire insurance coverage for residential properties.', coverage: ['Fire damage', 'Lightning strike', 'Explosion'] },
@@ -427,7 +343,6 @@ const productInfo = {
   PLI: { name: 'Personal Liability Individual (PLI)', description: 'Personal liability coverage for individuals.', coverage: ['Personal liability', 'Property damage', 'Accidental injury'] }
 }
 
-// Options for Fire products
 const bankOptions = [
   { label: 'Aruba Bank N.V.', value: 'aruba_bank' },
   { label: 'Banco di Caribe N.V.', value: 'banco_di_caribe' },
@@ -472,12 +387,10 @@ const lopIndemnityOptions = [
   { label: '12 months', value: '12' }
 ]
 
-// Reactive variables
 const selectedProduct = ref('')
 const selectedPublicLiabilityType = ref('')
 const premisesLocation = ref('')
 
-// Fire-specific variables
 const mortgageRequired = ref('no')
 const selectedBanks = ref([])
 const customBankName = ref('')
@@ -507,17 +420,40 @@ const maxTransitAmount = ref(0)
 const transitFrequency = ref('')
 const securityVehicles = ref('no')
 
-// Computed properties
 const filteredProductOptions = computed(() => {
-  const type = props.customerType.toLowerCase()
+  const type = props.customerType?.toLowerCase() || ''
+  const coverType = props.typeOfCover || ''
   
-  if (type === 'miscellaneous') {
-    return miscellaneousProductOptions
-  } else if (type === 'private') {
-    return allProductOptions.private
-  } else if (type === 'commercial') {
-    return allProductOptions.commercial
+  console.log('Filtering products:', { type, coverType })
+  
+  if (coverType === 'Miscellaneous') {
+    if (type === 'private') {
+      console.log('Showing Miscellaneous/Private products')
+      return miscellaneousProductOptions.filter(product => 
+        ['CAR', 'PA', 'PI', 'PLC', 'TOL'].includes(product.value)
+      )
+    } else if (type === 'commercial') {
+      console.log('Showing Miscellaneous/Commercial products')
+      return miscellaneousProductOptions.filter(product => 
+        ['BUHU', 'BUR', 'CFT', 'CFTE','MIT','PI', 'PLG', 'PLI'].includes(product.value)
+      )
+    } else {
+      console.log('No customer type selected for Miscellaneous')
+      return []
+    }
+  } 
+  else if (coverType === 'Fire') {
+    console.log('Showing Fire insurance products')
+    if (type === 'private') {
+      return allProductOptions.private
+    } else if (type === 'commercial') {
+      return allProductOptions.commercial
+    } else {
+      return []
+    }
   }
+  
+  console.log('No cover type selected')
   return []
 })
 
@@ -542,65 +478,50 @@ const showHomeContentsSection = computed(() => {
 })
 
 const isStepValid = computed(() => {
-  // Basic validation for all types
-  if (!selectedProduct.value || !premisesLocation.value) return false
+  if (!selectedProduct.value) return false
+  if (!premisesLocation.value) return false
+
   
-  // Public liability type validation
-  if (selectedProduct.value === 'PLC' && !selectedPublicLiabilityType.value) return false
-  
+
   if (isMiscellaneous.value) {
-    // Miscellaneous-specific validations
-    switch (selectedProduct.value) {
-      case 'BUHU':
-        if (!securityMeasures.value || maxCashOnPremises.value <= 0) return false
-        if (previousBreakIns.value === 'yes' && !breakInDetails.value) return false
-        break
-        
-      case 'CAR':
-        if (contractValue.value <= 0 || contractDuration.value <= 0 || !contractDescription.value) return false
-        break
-        
-      case 'MIT':
-        if (maxTransitAmount.value <= 0 || !transitFrequency.value) return false
-        break
-        
-      // Add validation for other miscellaneous products as needed
-    }
-  } else {
-    // Fire-specific validations
-    if (mortgageRequired.value === 'yes') {
-      if (selectedBanks.value.length === 0) return false
-      if (selectedBanks.value.includes('other') && !customBankName.value) return false
-    }
-    
-    if (!ownerTenant.value) return false
-    
-    if (showHomeContentsSection.value && !homeContentsCoverage.value) return false
-    
-    if (!propertyUsage.value) return false
-    
-    if (propertyUsage.value === 'residence_commercial') {
-      if (!commercialActivityType.value) return false
-      if (commercialActivityType.value === 'other' && !customActivityType.value) return false
-    }
-    
-    if (propertyUsage.value === 'commercial_only') {
-      if (!commercialBusinessType.value) return false
-      if (commercialBusinessType.value === 'other' && !customBusinessType.value) return false
-    }
-    
-    if (selectedProduct.value === 'LOP' && propertyUsage.value !== 'residence_only') {
-      if (!lopAnnualTurnover.value || !lopIndemnityPeriod.value ||
-          !lopGrossProfit.value || !lopStandingCharges.value) return false
-      
-      if (lopPreviousClaims.value === 'yes' && !lopClaimDescription.value) return false
-    }
+    return true
   }
-  
+
+  if (mortgageRequired.value === 'yes') {
+    if (selectedBanks.value.length === 0) return false
+    if (selectedBanks.value.includes('other') && !customBankName.value) return false
+  }
+
+  if (!ownerTenant.value) return false
+
+  if (showHomeContentsSection.value && !homeContentsCoverage.value) return false
+
+  if (!propertyUsage.value) return false
+
+  if (propertyUsage.value === 'residence_commercial') {
+    if (!commercialActivityType.value) return false
+    if (commercialActivityType.value === 'other' && !customActivityType.value) return false
+  }
+
+  if (propertyUsage.value === 'commercial_only') {
+    if (!commercialBusinessType.value) return false
+    if (commercialBusinessType.value === 'other' && !customBusinessType.value) return false
+  }
+
+  if (selectedProduct.value === 'LOP' && propertyUsage.value !== 'residence_only') {
+    if (
+      !lopAnnualTurnover.value ||
+      !lopIndemnityPeriod.value ||
+      !lopGrossProfit.value ||
+      !lopStandingCharges.value
+    ) return false
+
+    if (lopPreviousClaims.value === 'yes' && !lopClaimDescription.value) return false
+  }
+
   return true
 })
 
-// Methods
 const getBankDisplayNames = () => {
   const bankNames = selectedBanks.value.map(bankValue => {
     if (bankValue === 'other') {
@@ -619,10 +540,8 @@ const handleProductChange = (product) => {
 }
 
 const resetDependentProductFields = () => {
-  // Reset all product-specific fields
   selectedPublicLiabilityType.value = ''
   
-  // Reset Fire fields
   ownerTenant.value = ''
   homeContentsCoverage.value = ''
   propertyUsage.value = ''
@@ -637,7 +556,6 @@ const resetDependentProductFields = () => {
   lopPreviousClaims.value = 'no'
   lopClaimDescription.value = ''
   
-  // Reset Miscellaneous fields
   securityMeasures.value = ''
   maxCashOnPremises.value = 0
   previousBreakIns.value = 'no'
@@ -658,19 +576,46 @@ const handleMortgageChange = (value) => {
   emitValidation()
 }
 
+const showCustomNotification = (message, color = 'primary', icon = 'info') => {
+  Notify.create({
+    message,
+    color,
+    textColor: 'white',
+    icon,
+    position: 'center',
+    timeout: 4000,
+    actions: [{ label: '✖', color: 'white', handler: () => {} }],
+    classes: 'material-notify',
+    html: true,
+    style: `
+      font-size: 20px; 
+      font-weight: 600; 
+      padding: 24px 32px; 
+      border-radius: 24px; 
+      min-width: 360px; 
+      max-width: 50px;
+      box-shadow: 0 16px 36px rgba(0,0,0,0.28);
+      text-align: center;
+    `
+  })
+}
+
 const printMortgageDocument = () => {
   const bankNames = getBankDisplayNames()
   const documentContent = `Client: ${customerName.value}\nPolicy: ${policyNumber.value}\nBanks: ${bankNames}`
   console.log('Printing mortgage document:', documentContent)
-  alert('Mortgage document would be printed now.')
+
+  showCustomNotification('Mortgage document sent to printer', 'primary', 'print')
 }
 
 const downloadMortgageDocument = () => {
   const bankNames = getBankDisplayNames()
   const documentContent = `Mortgage Clause Document\n\nClient: ${customerName.value}\nBanks: ${bankNames}`
   console.log('Downloading mortgage document:', documentContent)
-  alert('Mortgage document would be downloaded as PDF.')
+
+  showCustomNotification('Mortgage document downloaded as PDF', 'positive', 'download')
 }
+
 
 const emitValidation = () => {
   emit('validation-changed', isStepValid.value)
@@ -685,7 +630,6 @@ const resetForm = () => {
   selectedPublicLiabilityType.value = ''
   premisesLocation.value = ''
   
-  // Reset Fire fields
   mortgageRequired.value = 'no'
   selectedBanks.value = []
   customBankName.value = ''
@@ -693,7 +637,6 @@ const resetForm = () => {
   resetDependentProductFields()
 }
 
-// Watchers
 watch(isStepValid, (newVal) => {
   emit('validation-changed', newVal)
 }, { immediate: true })
@@ -737,7 +680,6 @@ watch(() => ({
 }, { deep: true })
 
 watch(() => props.modelValue, (newVal) => {
-  // Update all fields from modelValue
   if (newVal.selectedProduct) selectedProduct.value = newVal.selectedProduct
   if (newVal.selectedPublicLiabilityType) selectedPublicLiabilityType.value = newVal.selectedPublicLiabilityType
   if (newVal.premisesLocation) premisesLocation.value = newVal.premisesLocation
@@ -823,5 +765,26 @@ defineExpose({
 
 .document-content p {
   margin-bottom: 8px;
+}
+
+@keyframes materialFadeBounce {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+  80% {
+    transform: scale(0.97);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.material-notify {
+  animation: materialFadeBounce 0.5s ease forwards;
 }
 </style>

@@ -1,6 +1,5 @@
 <template>
   <div>
-    <!-- SECCION 12A - BUILDINGS -->
     <div class="q-mb-md">
       <div class="text-subtitle2 q-mb-sm">12a) On main building(s) and structures *</div>
       <q-select
@@ -27,7 +26,6 @@
       </div>
     </div>
 
-    <!-- SECCION 12B - BUSINESS FURNITURE -->
     <div class="q-mb-md">
       <div class="text-subtitle2 q-mb-sm">12b) On business furniture, fixtures and equipment *</div>
       <q-select
@@ -54,7 +52,6 @@
       </div>
     </div>
 
-    <!-- SECCION 12C - ELECTRONIC EQUIPMENT -->
     <div class="q-mb-md">
       <div class="text-subtitle2 q-mb-sm">12c) On electronic equipment *</div>
       <q-select
@@ -81,7 +78,6 @@
       </div>
     </div>
 
-    <!-- SECCION 12D - STOCKS -->
     <div class="q-mb-md">
       <div class="text-subtitle2 q-mb-sm">12d) On stocks *</div>
       <q-select
@@ -108,7 +104,6 @@
       </div>
     </div>
 
-    <!-- SECCION 12E - OTHER ITEMS -->
     <div class="q-mb-md">
       <div class="text-subtitle2 q-mb-sm">12e) Other items *</div>
       <q-input
@@ -128,7 +123,6 @@
       />
     </div>
 
-    <!-- SECCION 12F - BURGLARY COVER -->
     <div class="q-mb-md">
       <div class="text-subtitle2 q-mb-sm">12f) Burglary cover Premier Risque / First Loss *</div>
       <div class="row q-col-gutter-md">
@@ -183,7 +177,6 @@
       </div>
     </div>
 
-    <!-- SECCION 12G - BUSINESS INTERRUPTION -->
     <div class="q-mb-md">
       <div class="text-subtitle2 q-mb-sm">12g) Business Interruption *</div>
       <div class="row q-col-gutter-md">
@@ -253,7 +246,6 @@
       </div>
     </div>
 
-    <!-- SECCION 12H - PLATE GLASS -->
     <div class="q-mb-md">
       <div class="text-subtitle2 q-mb-sm">12h) Plate Glass *</div>
       <div class="row q-col-gutter-md">
@@ -311,7 +303,6 @@
       </div>
     </div>
 
-    <!-- SECCION 12I - ADDITIONAL COVERAGE -->
     <div class="q-mb-md">
       <div class="text-subtitle2 q-mb-sm">12i) Additional Coverage *</div>
       <div class="row q-col-gutter-md">
@@ -338,68 +329,9 @@
           map-options
           :rules="[val => val && val.length > 0 || 'Select at least one additional coverage']"
         />
-        
-        <!-- Inputs para las coberturas adicionales seleccionadas -->
-        <div v-if="selectedAdditionalCoverages.includes('loss_of_rent')" class="q-ml-md q-mt-sm">
-          <q-input
-            v-model="additionalCoverageValues.lossOfRentWeeks"
-            label="Number of weeks for loss of rent"
-            type="number"
-            suffix="weeks"
-            outlined
-            dense
-            class="q-mt-md"
-            :rules="[
-              val => val > 0 || 'Weeks must be greater than 0',
-              val => val <= 52 || 'Maximum 52 weeks'
-            ]"
-          />
-          <div class="text-caption text-grey-7 q-mt-xs q-ml-md">
-            Subject to maximum of 5% of TSI ({{ formatCurrency(maxLossOfRent) }})
-          </div>
-        </div>
-        
-        <div v-if="selectedAdditionalCoverages.includes('removal_debris')" class="q-ml-md q-mt-sm">
-          <q-input
-            v-model="additionalCoverageValues.removalDebrisPercentage"
-            label="Percentage for removal of debris"
-            type="number"
-            suffix="%"
-            outlined
-            dense
-            class="q-mt-md"
-            :rules="[
-              val => val > 0 || 'Percentage must be greater than 0',
-              val => val <= 10 || 'Maximum 10% of TSI'
-            ]"
-          />
-          <div class="text-caption text-grey-7 q-mt-xs q-ml-md">
-            Subject to maximum of 10% of TSI ({{ formatCurrency(maxRemovalDebris) }})
-          </div>
-        </div>
-        
-        <div v-if="selectedAdditionalCoverages.includes('burglary_damage')" class="q-ml-md q-mt-sm">
-          <q-input
-            v-model="additionalCoverageValues.burglaryDamageAmount"
-            label="Amount for damage to building in burglary"
-            type="number"
-            prefix="$"
-            outlined
-            dense
-            class="q-mt-md"
-            :rules="[
-              val => val > 0 || 'Amount must be greater than 0',
-              val => val <= 5000 || 'Maximum AWG 5,000'
-            ]"
-          />
-          <div class="text-caption text-grey-7 q-mt-xs q-ml-md">
-            Maximum AWG 5,000
-          </div>
-        </div>
       </div>
     </div>
 
-    <!-- TABLA DE CALCULO MANUAL -->
     <div class="q-mb-md">
       <div class="text-subtitle2 q-mb-sm">Premium Calculation (Commercial - Manual Rates)</div>
       <div class="text-caption text-grey-7 q-mb-sm">
@@ -424,7 +356,6 @@
                 {{ formatCurrency(props.row.sumInsured) }}
               </q-td>
               <q-td key="rate" :props="props">
-                <!-- INPUT MANUAL para tasa -->
                 <q-input
                   v-model="manualRates[props.row.category]"
                   type="number"
@@ -442,7 +373,6 @@
             </q-tr>
           </template>
 
-          <!-- Fila para Total Sum Insured -->
           <template v-slot:bottom-row>
             <q-tr class="bg-grey-2">
               <q-td colspan="2" class="text-weight-bold text-right">
@@ -456,12 +386,10 @@
           </template>
         </q-table>
 
-        <!-- INPUTS MANUALES para descuentos -->
         <div class="row q-col-gutter-sm q-pa-md">
           <div class="col-12 col-md-6">
             <div class="text-weight-bold q-mb-sm">Manual Discounts & Costs</div>
             
-            <!-- Special Discount -->
             <div class="row items-center q-mb-xs">
               <div class="col-6">Special Discount</div>
               <div class="col-3">
@@ -480,7 +408,6 @@
               </div>
             </div>
             
-            <!-- Extra Discount -->
             <div class="row items-center q-mb-xs">
               <div class="col-6">Extra Discount</div>
               <div class="col-3">
@@ -525,11 +452,9 @@
             </div>
           </div>
 
-          <!-- Columna derecha: Impuestos y total -->
           <div class="col-12 col-md-6">
             <div class="text-weight-bold q-mb-sm">Taxes & Total</div>
             
-            <!-- Tax Percentage -->
             <div class="row items-center q-mb-xs">
               <div class="col-6">Tax Percentage</div>
               <div class="col-3">
@@ -556,7 +481,6 @@
           </div>
         </div>
 
-        <!-- NOTA IMPORTANTE -->
         <q-card-section class="bg-yellow-2 text-caption">
           <q-icon name="info" class="q-mr-xs" />
           <strong>Note:</strong> For commercial policies, rates vary based on risk assessment. 
@@ -565,7 +489,6 @@
       </q-card>
     </div>
 
-    <!-- SECCION 13 - BUSINESS QUESTIONS -->
     <div class="q-mb-md">
       <div class="text-subtitle2 q-mb-sm">Question 13) Business Information *</div>
       <q-card flat bordered class="bg-grey-1">
@@ -660,7 +583,6 @@ import { ref, reactive, computed, watch, defineExpose } from 'vue'
 
 const emit = defineEmits(['validation-changed'])
 
-// Options para los selects
 const buildingOptions = [
   { label: 'On main building(s)', value: 'main_building' },
   { label: 'On warehouse / storage units', value: 'warehouse' },
@@ -719,7 +641,6 @@ const inventoryFrequencyOptions = [
 
 const yesNoOptions = ['Yes', 'No']
 
-// Reactive state
 const selectedBuildingItems = ref([])
 const selectedBusinessItems = ref([])
 const selectedElectronicItems = ref([])
@@ -747,14 +668,6 @@ const glassValue = ref(0)
 
 const additionalCoverage = ref('')
 
-// Agregar valores para coberturas adicionales
-const additionalCoverageValues = reactive({
-  lossOfRentWeeks: 0,
-  removalDebrisPercentage: 0,
-  burglaryDamageAmount: 0
-})
-
-// Business information para Question 13
 const businessInfo = reactive({
   yearsInBusiness: 0,
   annualTurnover: 0,
@@ -773,7 +686,6 @@ const burglaryStockAmounts = reactive({})
 
 const isFormValid = ref(false)
 
-// --- CÁLCULO MANUAL DE PRIMAS ---
 const manualRates = reactive({
   'Building': 2.50,
   'General Contents': 5.50,
@@ -792,7 +704,6 @@ const manualDiscounts = reactive({
 const manualCost = ref(23.50)
 const manualTaxPercentage = ref(7.52)
 
-// Columnas para la tabla de primas
 const premiumColumns = [
   { name: 'category', label: 'Category', field: 'category', align: 'left', sortable: true },
   { name: 'sumInsured', label: 'Sum Insured (S.I.)', field: 'sumInsured', align: 'right', sortable: true },
@@ -800,7 +711,6 @@ const premiumColumns = [
   { name: 'premium', label: 'Premium', field: 'premium', align: 'right', sortable: true }
 ]
 
-// Totales por categoría
 const totalBuildingAmount = computed(() => {
   return selectedBuildingItems.value.reduce((sum, item) => {
     return sum + (Number(buildingAmounts[item]) || 0)
@@ -825,11 +735,9 @@ const totalStockAmount = computed(() => {
   }, 0)
 })
 
-// Filas para la tabla de primas
 const premiumRows = computed(() => {
   const rows = []
   
-  // Building
   const buildingSum = totalBuildingAmount.value
   if (buildingSum > 0) {
     const buildingRate = manualRates['Building'] || 0
@@ -841,7 +749,6 @@ const premiumRows = computed(() => {
     })
   }
   
-  // General Contents (Business Items)
   const businessSum = totalBusinessAmount.value
   if (businessSum > 0) {
     const businessRate = manualRates['General Contents'] || 0
@@ -853,7 +760,6 @@ const premiumRows = computed(() => {
     })
   }
   
-  // Electronic Items
   const electronicSum = totalElectronicAmount.value
   if (electronicSum > 0) {
     const electronicRate = manualRates['Electronic Equipment'] || 0
@@ -865,7 +771,6 @@ const premiumRows = computed(() => {
     })
   }
   
-  // Stocks
   const stockSum = totalStockAmount.value
   if (stockSum > 0) {
     const stockRate = manualRates['Stocks'] || 0
@@ -877,7 +782,6 @@ const premiumRows = computed(() => {
     })
   }
   
-  // Other Items
   if (otherItemsAmount.value > 0) {
     const otherSum = otherItemsAmount.value
     const otherRate = manualRates['Other Items'] || 0
@@ -892,29 +796,23 @@ const premiumRows = computed(() => {
   return rows
 })
 
-// Cálculo total de la prima base
 const totalBasePremium = computed(() => {
   return premiumRows.value.reduce((sum, row) => sum + row.premium, 0)
 })
 
-// Función para actualizar cálculos
 const updateDiscounts = () => {
   const basePremium = totalBasePremium.value
   
-  // Calcular descuento especial
   manualDiscounts.specialAmount = basePremium * (manualDiscounts.specialPercentage / 100)
   
-  // Calcular descuento extra sobre el restante
   const afterSpecialDiscount = basePremium - manualDiscounts.specialAmount
   manualDiscounts.extraAmount = afterSpecialDiscount * (manualDiscounts.extraPercentage / 100)
 }
 
-// Función para actualizar cálculo de primas
 const updatePremiumCalculation = () => {
   updateDiscounts()
 }
 
-// Cálculos de primas
 const subtotalPremium = computed(() => {
   return totalBasePremium.value - manualDiscounts.specialAmount - manualDiscounts.extraAmount + manualCost.value
 })
@@ -927,7 +825,6 @@ const totalPremium = computed(() => {
   return subtotalPremium.value + taxAmount.value
 })
 
-// Label getters
 const getBuildingLabel = (value) => {
   const option = buildingOptions.find(opt => opt.value === value)
   return option ? option.label : value
@@ -948,7 +845,6 @@ const getStockLabel = (value) => {
   return option ? option.label : value
 }
 
-// Format currency
 const formatCurrency = (value) => {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
@@ -958,7 +854,6 @@ const formatCurrency = (value) => {
   }).format(value || 0)
 }
 
-// Total sum insured
 const totalSumInsured = computed(() => {
   let total = 0
   
@@ -983,28 +878,6 @@ const totalSumInsured = computed(() => {
   return total
 })
 
-// Calculated values para additional coverages
-const maxLossOfRent = computed(() => {
-  return totalSumInsured.value * 0.05 // 5% of TSI
-})
-
-const maxRemovalDebris = computed(() => {
-  return totalSumInsured.value * 0.10 // 10% of TSI
-})
-
-const calculatedLossOfRent = computed(() => {
-  if (!additionalCoverageValues.lossOfRentWeeks) return 0
-  const percentage = Math.min((additionalCoverageValues.lossOfRentWeeks / 52) * 0.05, 0.05)
-  return totalSumInsured.value * percentage
-})
-
-const calculatedRemovalDebris = computed(() => {
-  if (!additionalCoverageValues.removalDebrisPercentage) return 0
-  const percentage = Math.min(additionalCoverageValues.removalDebrisPercentage / 100, 0.10)
-  return totalSumInsured.value * percentage
-})
-
-// Event handlers
 const handleBurglaryCoverChange = (value) => {
   if (value === 'Yes') {
     burglaryPercentage.value = burglaryPercentageOptions[0].value
@@ -1036,16 +909,10 @@ const handlePlateGlassChange = (value) => {
 const handleAdditionalCoverageChange = (value) => {
   if (value === 'No') {
     selectedAdditionalCoverages.value = []
-    // Resetear valores
-    additionalCoverageValues.lossOfRentWeeks = 0
-    additionalCoverageValues.removalDebrisPercentage = 0
-    additionalCoverageValues.burglaryDamageAmount = 0
   }
 }
 
-// Combined form data
 const combinedFormData = computed(() => ({
-  // Sección 12
   selectedBuildingItems: selectedBuildingItems.value,
   selectedBusinessItems: selectedBusinessItems.value,
   selectedElectronicItems: selectedElectronicItems.value,
@@ -1072,7 +939,6 @@ const combinedFormData = computed(() => ({
   glassValue: glassValue.value,
   
   additionalCoverage: additionalCoverage.value,
-  additionalCoverageValues: { ...additionalCoverageValues },
   
   buildingAmounts: { ...buildingAmounts },
   businessAmounts: { ...businessAmounts },
@@ -1080,17 +946,14 @@ const combinedFormData = computed(() => ({
   stockAmounts: { ...stockAmounts },
   burglaryStockAmounts: { ...burglaryStockAmounts },
   
-  // Sección 13
   businessInfo: { ...businessInfo },
   
-  // Totales y cálculos
   totalSumInsured: totalSumInsured.value,
   totalBuildingAmount: totalBuildingAmount.value,
   totalBusinessAmount: totalBusinessAmount.value,
   totalElectronicAmount: totalElectronicAmount.value,
   totalStockAmount: totalStockAmount.value,
   
-  // Premium calculations MANUALES
   premiumCalculation: {
     manualRates: { ...manualRates },
     manualDiscounts: { ...manualDiscounts },
@@ -1106,11 +969,9 @@ const combinedFormData = computed(() => ({
   }
 }))
 
-// Validation function
 const validate = () => {
   console.log('=== VALIDATING COMMERCIAL QUESTIONS ===')
   
-  // 1. VALIDAR QUE TODOS LOS ITEMS PRINCIPALES TENGAN AL MENOS UN ELEMENTO
   const hasBuildingItems = selectedBuildingItems.value.length > 0
   const hasBusinessItems = selectedBusinessItems.value.length > 0
   const hasElectronicItems = selectedElectronicItems.value.length > 0
@@ -1118,35 +979,30 @@ const validate = () => {
   const hasOtherItems = Number(otherItemsAmount.value) > 0 && !!otherItemsDescription.value
 
   if (!hasBuildingItems) {
-    console.log('❌ No building items selected')
     isFormValid.value = false
     emit('validation-changed', false)
     return false
   }
 
   if (!hasBusinessItems) {
-    console.log('❌ No business items selected')
     isFormValid.value = false
     emit('validation-changed', false)
     return false
   }
 
   if (!hasElectronicItems) {
-    console.log('❌ No electronic items selected')
     isFormValid.value = false
     emit('validation-changed', false)
     return false
   }
 
   if (!hasStockItems) {
-    console.log('❌ No stock items selected')
     isFormValid.value = false
     emit('validation-changed', false)
     return false
   }
 
   if (!hasOtherItems) {
-    console.log('❌ Other items not completed')
     isFormValid.value = false
     emit('validation-changed', false)
     return false
@@ -1189,9 +1045,7 @@ const validate = () => {
     return false
   }
   
-  // 2. VALIDAR BURGLARY COVER (12F)
   if (!burglaryCover.value) {
-    console.log('❌ Burglary cover not selected')
     isFormValid.value = false
     emit('validation-changed', false)
     return false
@@ -1199,14 +1053,12 @@ const validate = () => {
   
   if (burglaryCover.value === 'Yes') {
     if (!burglaryPercentage.value) {
-      console.log('❌ Burglary percentage not selected')
       isFormValid.value = false
       emit('validation-changed', false)
       return false
     }
     
     if (burglaryPercentage.value === 'other' && !customBurglaryPercentage.value) {
-      console.log('❌ Custom burglary percentage not entered')
       isFormValid.value = false
       emit('validation-changed', false)
       return false
@@ -1216,16 +1068,13 @@ const validate = () => {
       Number(burglaryStockAmounts[item]) > 0
     )
     if (!hasValidBurglaryAmounts) {
-      console.log('❌ Invalid burglary stock amounts')
       isFormValid.value = false
       emit('validation-changed', false)
       return false
     }
   }
   
-  // 3. VALIDAR BUSINESS INTERRUPTION (12G)
   if (!businessInterruption.value) {
-    console.log('❌ Business interruption not selected')
     isFormValid.value = false
     emit('validation-changed', false)
     return false
@@ -1233,40 +1082,33 @@ const validate = () => {
   
   if (businessInterruption.value === 'Yes') {
     if (!annualGrossProfits.value || Number(annualGrossProfits.value) <= 0) {
-      console.log('❌ Invalid annual gross profits')
       isFormValid.value = false
       emit('validation-changed', false)
       return false
     }
     if (!additionalCostWorking.value || Number(additionalCostWorking.value) <= 0) {
-      console.log('❌ Invalid additional cost working')
       isFormValid.value = false
       emit('validation-changed', false)
       return false
     }
     if (!rentReceivable.value || Number(rentReceivable.value) <= 0) {
-      console.log('❌ Invalid rent receivable')
       isFormValid.value = false
       emit('validation-changed', false)
       return false
     }
     if (!otherBusinessInterruption.value) {
-      console.log('❌ Other business interruption not specified')
       isFormValid.value = false
       emit('validation-changed', false)
       return false
     }
     if (!otherBusinessInterruptionAmount.value || Number(otherBusinessInterruptionAmount.value) <= 0) {
-      console.log('❌ Invalid other business interruption amount')
       isFormValid.value = false
       emit('validation-changed', false)
       return false
     }
   }
   
-  // 4. VALIDAR PLATE GLASS (12H)
   if (!plateGlass.value) {
-    console.log('❌ Plate glass not selected')
     isFormValid.value = false
     emit('validation-changed', false)
     return false
@@ -1274,16 +1116,13 @@ const validate = () => {
   
   if (plateGlass.value === 'Yes') {
     if (!glassPosition.value || !glassSize.value || !glassDescription.value || !glassValue.value || Number(glassValue.value) <= 0) {
-      console.log('❌ Invalid plate glass details')
       isFormValid.value = false
       emit('validation-changed', false)
       return false
     }
   }
   
-  // 5. VALIDAR ADDITIONAL COVERAGE (12I)
   if (!additionalCoverage.value) {
-    console.log('❌ Additional coverage not selected')
     isFormValid.value = false
     emit('validation-changed', false)
     return false
@@ -1291,102 +1130,55 @@ const validate = () => {
   
   if (additionalCoverage.value === 'Yes') {
     if (!selectedAdditionalCoverages.value || selectedAdditionalCoverages.value.length === 0) {
-      console.log('❌ No additional coverages selected')
-      isFormValid.value = false
-      emit('validation-changed', false)
-      return false
-    }
-    
-    // Validar los inputs específicos de cada cobertura seleccionada
-    let additionalCoverageValid = true
-    
-    if (selectedAdditionalCoverages.value.includes('loss_of_rent')) {
-      if (!additionalCoverageValues.lossOfRentWeeks || 
-          additionalCoverageValues.lossOfRentWeeks <= 0 || 
-          additionalCoverageValues.lossOfRentWeeks > 52) {
-        console.log('❌ Invalid loss of rent weeks')
-        additionalCoverageValid = false
-      }
-    }
-    
-    if (selectedAdditionalCoverages.value.includes('removal_debris')) {
-      if (!additionalCoverageValues.removalDebrisPercentage || 
-          additionalCoverageValues.removalDebrisPercentage <= 0 || 
-          additionalCoverageValues.removalDebrisPercentage > 10) {
-        console.log('❌ Invalid removal debris percentage')
-        additionalCoverageValid = false
-      }
-    }
-    
-    if (selectedAdditionalCoverages.value.includes('burglary_damage')) {
-      if (!additionalCoverageValues.burglaryDamageAmount || 
-          additionalCoverageValues.burglaryDamageAmount <= 0 || 
-          additionalCoverageValues.burglaryDamageAmount > 5000) {
-        console.log('❌ Invalid burglary damage amount')
-        additionalCoverageValid = false
-      }
-    }
-    
-    if (!additionalCoverageValid) {
       isFormValid.value = false
       emit('validation-changed', false)
       return false
     }
   }
   
-  // 6. VALIDAR BUSINESS INFORMATION (QUESTION 13)
   if (!businessInfo.yearsInBusiness || Number(businessInfo.yearsInBusiness) < 0) {
-    console.log('❌ Invalid years in business')
     isFormValid.value = false
     emit('validation-changed', false)
     return false
   }
   
   if (!businessInfo.annualTurnover || Number(businessInfo.annualTurnover) <= 0) {
-    console.log('❌ Invalid annual turnover')
     isFormValid.value = false
     emit('validation-changed', false)
     return false
   }
   
   if (!businessInfo.booksMaintained) {
-    console.log('❌ Books maintained not selected')
     isFormValid.value = false
     emit('validation-changed', false)
     return false
   }
   
   if (!businessInfo.stockInventoryFrequency) {
-    console.log('❌ Stock inventory frequency not selected')
     isFormValid.value = false
     emit('validation-changed', false)
     return false
   }
   
   if (!businessInfo.booksAudited) {
-    console.log('❌ Books audited not selected')
     isFormValid.value = false
     emit('validation-changed', false)
     return false
   }
   
   if (!businessInfo.booksSecured) {
-    console.log('❌ Books secured not selected')
     isFormValid.value = false
     emit('validation-changed', false)
     return false
   }
   
   if (!businessInfo.accountantDetails) {
-    console.log('❌ Accountant details not provided')
     isFormValid.value = false
     emit('validation-changed', false)
     return false
   }
   
-  // 7. VALIDAR TASAS MANUALES (Premium Calculation)
   if (totalSumInsured.value > 0) {
-    // Verificar que todas las tasas tengan valores válidos
     const categoriesWithAmount = []
     
     if (totalBuildingAmount.value > 0) categoriesWithAmount.push('Building')
@@ -1401,43 +1193,36 @@ const validate = () => {
     })
     
     if (!allRatesValid) {
-      console.log('❌ Invalid or missing rates')
       isFormValid.value = false
       emit('validation-changed', false)
       return false
     }
     
-    // Validar porcentajes de descuentos
     if (manualDiscounts.specialPercentage < 0 || manualDiscounts.specialPercentage > 100) {
-      console.log('❌ Invalid special discount percentage')
       isFormValid.value = false
       emit('validation-changed', false)
       return false
     }
     
     if (manualDiscounts.extraPercentage < 0 || manualDiscounts.extraPercentage > 100) {
-      console.log('❌ Invalid extra discount percentage')
       isFormValid.value = false
       emit('validation-changed', false)
       return false
     }
     
     if (manualTaxPercentage.value < 0 || manualTaxPercentage.value > 100) {
-      console.log('❌ Invalid tax percentage')
       isFormValid.value = false
       emit('validation-changed', false)
       return false
     }
   }
   
-  // Si pasa todas las validaciones
-  console.log('✅ All validations passed')
+  console.log(' All validations passed')
   isFormValid.value = true
   emit('validation-changed', true)
   return true
 }
 
-// Watchers
 watch([
   selectedBuildingItems,
   selectedBusinessItems,
@@ -1461,7 +1246,6 @@ watch([
   glassValue,
   additionalCoverage,
   selectedAdditionalCoverages,
-  // Business info watchers
   () => businessInfo.yearsInBusiness,
   () => businessInfo.annualTurnover,
   () => businessInfo.booksMaintained,
@@ -1476,9 +1260,7 @@ watch(() => businessAmounts, validate, { deep: true })
 watch(() => electronicAmounts, validate, { deep: true })
 watch(() => stockAmounts, validate, { deep: true })
 watch(() => burglaryStockAmounts, validate, { deep: true })
-watch(() => additionalCoverageValues, validate, { deep: true })
 
-// Watch para tasas manuales y descuentos
 watch(() => manualRates, validate, { deep: true })
 watch(() => manualDiscounts, () => {
   updateDiscounts()
@@ -1493,20 +1275,7 @@ watch(manualTaxPercentage, () => {
   validate()
 })
 
-// Watch para selectedAdditionalCoverages
-watch(selectedAdditionalCoverages, (newVal) => {
-  // Resetear valores cuando se deselecciona una opción
-  if (!newVal.includes('loss_of_rent')) {
-    additionalCoverageValues.lossOfRentWeeks = 0
-  }
-  if (!newVal.includes('removal_debris')) {
-    additionalCoverageValues.removalDebrisPercentage = 0
-  }
-  if (!newVal.includes('burglary_damage')) {
-    additionalCoverageValues.burglaryDamageAmount = 0
-  }
-  validate()
-}, { deep: true })
+watch(selectedAdditionalCoverages, validate, { deep: true })
 
 const resetForm = () => {
   console.log('Resetting CommercialQuestions form')
@@ -1538,12 +1307,6 @@ const resetForm = () => {
   
   additionalCoverage.value = ''
   
-  // Reset additional coverage values
-  additionalCoverageValues.lossOfRentWeeks = 0
-  additionalCoverageValues.removalDebrisPercentage = 0
-  additionalCoverageValues.burglaryDamageAmount = 0
-  
-  // Reset business info
   businessInfo.yearsInBusiness = 0
   businessInfo.annualTurnover = 0
   businessInfo.booksMaintained = ''
@@ -1552,7 +1315,6 @@ const resetForm = () => {
   businessInfo.booksSecured = ''
   businessInfo.accountantDetails = ''
   
-  // Reset tasas manuales a valores por defecto
   manualRates['Building'] = 2.50
   manualRates['General Contents'] = 5.50
   manualRates['Electronic Equipment'] = 10.00
@@ -1567,7 +1329,6 @@ const resetForm = () => {
   manualCost.value = 23.50
   manualTaxPercentage.value = 7.52
   
-  // Reset amounts
   Object.keys(buildingAmounts).forEach(key => delete buildingAmounts[key])
   Object.keys(businessAmounts).forEach(key => delete businessAmounts[key])
   Object.keys(electronicAmounts).forEach(key => delete electronicAmounts[key])
@@ -1578,7 +1339,6 @@ const resetForm = () => {
   emit('validation-changed', false)
 }
 
-// Inicializar cálculos
 updateDiscounts()
 
 defineExpose({
@@ -1587,7 +1347,6 @@ defineExpose({
   formData: combinedFormData,
   totalSumInsured,
   totalPremium,
-  // Exponer función para calcular
   updateDiscounts
 })
 </script>

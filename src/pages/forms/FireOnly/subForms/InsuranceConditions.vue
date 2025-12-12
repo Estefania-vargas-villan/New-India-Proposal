@@ -1,108 +1,95 @@
 <template>
-  <div class="insurance-conditions-container">
-    <div class="text-h6 text-primary q-mb-md">Step 10: Insurance & Claim History</div>
-    
-    <!-- Previous Insurance -->
+  <div>
+    <div class="text-h6 text-primary q-mb-md">Insurance & Claim History</div>
+
     <div class="q-mb-lg">
       <div class="text-subtitle2 q-mb-sm">Previous Insurance History</div>
       <div class="row q-col-gutter-md">
-        <div class="col-12 col-md-6">
-          <q-select
-            v-model="formData.previousInsurance"
-            :options="yesNoOptions"
-            label="Had previous insurance?"
-            outlined
-          />
+        <div class="col-12">
+          <div class="text-caption q-mb-xs">Had previous insurance? *</div>
+          <div class="row q-gutter-md">
+            <div class="col-auto">
+              <q-radio v-model="formData.previousInsurance" val="Yes" label="Yes" />
+            </div>
+            <div class="col-auto">
+              <q-radio v-model="formData.previousInsurance" val="No" label="No" />
+            </div>
+          </div>
         </div>
+        
         <div v-if="formData.previousInsurance === 'Yes'" class="col-12 col-md-6">
-          <q-input
-            v-model="formData.previousInsurer"
-            label="Previous Insurer"
-            outlined
-            placeholder="Name of previous insurance company"
-          />
+          <q-input v-model="formData.previousInsurer" label="Previous Insurer *" outlined
+            placeholder="Name of previous insurance company" />
         </div>
       </div>
-      
-      <!-- Claim History -->
+
       <div class="row q-col-gutter-md q-mt-md">
-        <div class="col-12 col-md-6">
-          <q-select
-            v-model="formData.previousClaims"
-            :options="yesNoOptions"
-            label="Any previous claims?"
-            outlined
-          />
+        <div class="col-12">
+          <div class="text-caption q-mb-xs">Any previous claims? *</div>
+          <div class="row q-gutter-md">
+            <div class="col-auto">
+              <q-radio v-model="formData.previousClaims" val="Yes" label="Yes" />
+            </div>
+            <div class="col-auto">
+              <q-radio v-model="formData.previousClaims" val="No" label="No" />
+            </div>
+          </div>
         </div>
+        
         <div v-if="formData.previousClaims === 'Yes'" class="col-12">
-          <q-input
-            v-model="formData.claimDetails"
-            label="Claim Details"
-            outlined
-            type="textarea"
-            rows="3"
-            placeholder="Describe previous claims, amounts, and dates"
-          />
+          <q-input v-model="formData.claimDetails" label="Claim Details *" outlined type="textarea" rows="3"
+            placeholder="Describe previous claims, amounts, and dates" />
         </div>
       </div>
     </div>
 
-    <!-- Applicable Conditions & Deductibles -->
     <div class="q-mb-lg">
-      <div class="text-subtitle2 q-mb-sm">Step 12: Applicable Conditions & Deductibles</div>
-      
-      <!-- Standard Conditions Notice -->
+      <div class="text-subtitle2 q-mb-sm">Applicable Conditions & Deductibles</div>
+
       <q-banner class="bg-blue-1 q-mb-md">
         <q-icon name="info" size="sm" class="q-mr-sm" />
         Standard NIA policy terms & conditions as per cover.
       </q-banner>
 
-      <!-- Product-specific Conditions -->
       <div class="q-mb-lg">
         <div class="text-subtitle2 q-mb-sm">Standard Conditions for {{ selectedProductName }}</div>
-        
-        <!-- Automatic Conditions -->
+
         <div v-if="showIndexClause" class="q-mb-sm">
           <q-checkbox v-model="autoConditions.index" label="Subject to Index Clause" disable />
-          <div class="text-caption text-grey">(Automatic - selected in Step 8)</div>
-        </div>
-        
-        <div v-if="showSolarPanelsClause" class="q-mb-sm">
-          <q-checkbox v-model="autoConditions.solarPanels" label="Subject to Solar Panels Clause" disable />
-          <div class="text-caption text-grey">(Automatic - solar panels amount entered in Step 9)</div>
-        </div>
-        
-        <div v-if="showLossOfRentClause" class="q-mb-sm">
-          <q-checkbox v-model="autoConditions.lossOfRent" label="Subject to Loss of Rent Clause" disable />
-          <div class="text-caption text-grey">(Automatic - selected in Step 9 question 12f)</div>
+          <div class="text-caption text-grey">(Automatic)</div>
         </div>
 
-        <!-- Product-specific Conditions List -->
+        <div v-if="showSolarPanelsClause" class="q-mb-sm">
+          <q-checkbox v-model="autoConditions.solarPanels" label="Subject to Solar Panels Clause" disable />
+          <div class="text-caption text-grey">(Automatic - solar panels amount entered )</div>
+        </div>
+
+        <div v-if="showLossOfRentClause" class="q-mb-sm">
+          <q-checkbox v-model="autoConditions.lossOfRent" label="Subject to Loss of Rent Clause" disable />
+          <div class="text-caption text-grey">(Automatic)</div>
+        </div>
+
         <div class="bg-grey-2 q-pa-md rounded-borders">
-          <div v-for="condition in productConditions" :key="condition" class="q-mb-xs">
-            <q-checkbox v-model="selectedConditions" :val="condition" :label="condition" />
+          <div v-if="productConditions.length > 0">
+            <div v-for="condition in productConditions" :key="condition" class="q-mb-xs">
+              <q-checkbox v-model="selectedConditions" :val="condition" :label="condition" />
+            </div>
+          </div>
+          <div v-else class="text-center text-grey q-py-md">
+            No standard conditions available for this product
           </div>
         </div>
       </div>
 
-      <!-- Additional Clauses -->
       <div class="q-mb-lg">
         <div class="text-subtitle2 q-mb-sm">Additional Clauses</div>
-        <q-input
-          v-model="formData.additionalClauses"
-          label="Add additional clauses if needed"
-          outlined
-          type="textarea"
-          rows="2"
-          placeholder="Enter any additional clauses not covered above"
-        />
+        <q-input v-model="formData.additionalClauses" label="Add additional clauses if needed" outlined type="textarea"
+          rows="2" placeholder="Enter any additional clauses not covered above" />
       </div>
 
-      <!-- Excess/Deductibles -->
       <div class="q-mb-lg">
         <div class="text-subtitle2 q-mb-sm">Applicable Excess/Deductibles</div>
-        
-        <!-- Excess for Catastrophic Perils -->
+
         <div v-if="showCatastrophicExcess" class="row q-col-gutter-md q-mb-md">
           <div class="col-12 col-md-8">
             <div class="text-caption">Excess for catastrophic perils:</div>
@@ -112,7 +99,6 @@
           </div>
         </div>
 
-        <!-- Standard Excess -->
         <div class="row q-col-gutter-md q-mb-md">
           <div class="col-12 col-md-6">
             <div class="text-caption">
@@ -120,18 +106,11 @@
             </div>
           </div>
           <div class="col-12 col-md-6">
-            <q-input
-              v-model="formData.standardExcessAmount"
-              outlined
-              prefix="AWG"
-              type="number"
-              placeholder="Enter amount"
-              :hint="getExcessHint('standard')"
-            />
+            <q-input v-model="formData.standardExcessAmount" outlined prefix="AWG" type="number"
+              placeholder="Enter amount *" :hint="getExcessHint('standard')" />
           </div>
         </div>
 
-        <!-- Solar Panels Excess -->
         <div v-if="showSolarPanelsExcess" class="row q-col-gutter-md q-mb-md">
           <div class="col-12 col-md-6">
             <div class="text-caption">Excess Solar Panels:</div>
@@ -142,37 +121,39 @@
         </div>
       </div>
 
-      <!-- Special Conditions for CFT/CFTE -->
       <div v-if="isCFTProduct" class="q-mb-lg bg-yellow-1 q-pa-md rounded-borders">
         <div class="text-subtitle2 q-mb-sm">Special Conditions for {{ selectedProductName }}</div>
-        <div v-for="condition in cftConditions" :key="condition" class="q-mb-xs">
-          <q-checkbox v-model="cftSelectedConditions" :val="condition" :label="condition" />
+        <div v-if="cftConditions.length > 0">
+          <div v-for="condition in cftConditions" :key="condition" class="q-mb-xs">
+            <q-checkbox v-model="cftSelectedConditions" :val="condition" :label="condition" />
+          </div>
+        </div>
+        <div v-else class="text-center text-grey q-py-md">
+          No special conditions available
         </div>
       </div>
     </div>
 
-    <!-- Summary of Conditions -->
-    <div v-if="selectedConditions.length > 0" class="q-mt-lg bg-grey-2 q-pa-md rounded-borders">
+    <div v-if="allSelectedConditions.length > 0" class="q-mt-lg bg-grey-2 q-pa-md rounded-borders">
       <div class="text-subtitle2 q-mb-sm">Summary of Selected Conditions</div>
       <div v-for="condition in allSelectedConditions" :key="condition" class="q-mb-xs">
         <q-icon name="check_circle" color="positive" size="sm" />
         {{ condition }}
       </div>
-      
+
       <div v-if="formData.standardExcessAmount" class="q-mt-sm">
         <strong>Standard Excess:</strong> AWG {{ formData.standardExcessAmount }} on each and every claim
       </div>
-      
+
       <div v-if="showCatastrophicExcess" class="q-mt-sm">
         <strong>Catastrophic Excess:</strong> 2% of total sum insured
       </div>
-      
+
       <div v-if="showSolarPanelsExcess" class="q-mt-sm">
         <strong>Solar Panels Excess:</strong> AWG 1,500.00 each and every claim
       </div>
     </div>
 
-    <!-- Validation Status -->
     <div class="q-mt-md">
       <q-banner :class="isFormValid ? 'bg-positive text-white' : 'bg-warning text-dark'">
         <template v-slot:avatar>
@@ -212,7 +193,6 @@ const props = defineProps({
   }
 })
 
-// Form data
 const formData = reactive({
   previousInsurance: '',
   previousInsurer: '',
@@ -223,10 +203,6 @@ const formData = reactive({
   ...props.formData
 })
 
-// Options
-const yesNoOptions = ['Yes', 'No']
-
-// Auto conditions (checked automatically based on selections)
 const autoConditions = reactive({
   index: props.hasIndexClause,
   solarPanels: props.hasSolarPanels,
@@ -281,7 +257,6 @@ const conditionsDatabase = {
   ]
 }
 
-// Computed properties
 const selectedProductName = computed(() => {
   const productNames = {
     'FIR': 'Fire Only',
@@ -332,7 +307,7 @@ const allSelectedConditions = computed(() => {
   if (autoConditions.index && showIndexClause.value) auto.push('Subject to Index Clause')
   if (autoConditions.solarPanels && showSolarPanelsClause.value) auto.push('Subject to Solar Panels Clause')
   if (autoConditions.lossOfRent && showLossOfRentClause.value) auto.push('Subject to Loss of Rent Clause')
-  
+
   return [...auto, ...selectedConditions.value, ...cftSelectedConditions.value]
 })
 
@@ -340,54 +315,68 @@ const getExcessLabel = (type) => {
   if (isCFTProduct.value) {
     return 'Excess Applicable:'
   }
-  return type === 'catastrophic' 
-    ? 'Excess for catastrophic perils:' 
+  return type === 'catastrophic'
+    ? 'Excess for catastrophic perils:'
     : 'Excess Any Other Perils:'
 }
 
-const getExcessHint = (type) => {
+const getExcessHint = (_type) => {
   return 'AWG. ---------- On each and every claim'
 }
 
 const isFormValid = computed(() => {
-  // Previous insurance info if Yes is selected
-  if (formData.previousInsurance === 'Yes' && !formData.previousInsurer) {
+  if (!formData.previousInsurance) {
     return false
   }
-  
-  if (formData.previousClaims === 'Yes' && !formData.claimDetails) {
+
+  if (!formData.previousClaims) {
     return false
   }
-  
-  // Standard excess amount is required
-  if (!formData.standardExcessAmount) {
+
+  if (formData.previousInsurance === 'Yes' && !formData.previousInsurer.trim()) {
     return false
   }
-  
+
+  if (formData.previousClaims === 'Yes' && !formData.claimDetails.trim()) {
+    return false
+  }
+
+  if (!formData.standardExcessAmount || isNaN(formData.standardExcessAmount) || Number(formData.standardExcessAmount) <= 0) {
+    return false
+  }
+
   return true
 })
 
 const validationMessage = computed(() => {
   if (!isFormValid.value) {
-    if (!formData.standardExcessAmount) {
-      return 'Please enter the standard excess amount'
+    if (!formData.previousInsurance) {
+      return 'Please select if you had previous insurance'
     }
-    if (formData.previousInsurance === 'Yes' && !formData.previousInsurer) {
+    if (!formData.previousClaims) {
+      return 'Please select if you had previous claims'
+    }
+    if (formData.previousInsurance === 'Yes' && !formData.previousInsurer.trim()) {
       return 'Please specify previous insurer'
+    }
+    if (formData.previousClaims === 'Yes' && !formData.claimDetails.trim()) {
+      return 'Please provide claim details'
+    }
+    if (!formData.standardExcessAmount || isNaN(formData.standardExcessAmount) || Number(formData.standardExcessAmount) <= 0) {
+      return 'Please enter a valid standard excess amount'
     }
     return 'Please complete all required fields'
   }
   return `Valid: ${allSelectedConditions.value.length} condition(s) selected`
 })
 
-// Methods
 const emitValidation = () => {
   const dataToEmit = {
     ...formData,
     selectedConditions: allSelectedConditions.value,
     autoConditions: { ...autoConditions }
   }
-  
+
   emit('update:modelValue', dataToEmit)
   emit('validation-changed', isFormValid.value)
 }
@@ -397,17 +386,21 @@ const validate = () => {
 }
 
 const resetForm = () => {
-  Object.keys(formData).forEach(key => {
-    formData[key] = ''
-  })
+  formData.previousInsurance = ''
+  formData.previousInsurer = ''
+  formData.previousClaims = ''
+  formData.claimDetails = ''
+  formData.standardExcessAmount = ''
+  formData.additionalClauses = ''
+  
   selectedConditions.value = []
   cftSelectedConditions.value = []
+  
   autoConditions.index = props.hasIndexClause
   autoConditions.solarPanels = props.hasSolarPanels
   autoConditions.lossOfRent = props.hasLossOfRent
 }
 
-// Watchers
 watch(isFormValid, (newVal) => {
   emit('validation-changed', newVal)
 }, { immediate: true })
@@ -417,7 +410,6 @@ watch(formData, () => {
 }, { deep: true })
 
 watch(() => props.productType, () => {
-  // Reset selected conditions when product changes
   selectedConditions.value = []
   cftSelectedConditions.value = []
 })
@@ -434,12 +426,16 @@ watch(() => props.hasIndexClause, (newVal) => {
   autoConditions.index = newVal
 })
 
-// Initialize
 if (props.formData) {
   Object.assign(formData, props.formData)
 }
 
-// Expose methods
+watch(() => [props.hasSolarPanels, props.hasLossOfRent, props.hasIndexClause], () => {
+  autoConditions.solarPanels = props.hasSolarPanels
+  autoConditions.lossOfRent = props.hasLossOfRent
+  autoConditions.index = props.hasIndexClause
+}, { immediate: true })
+
 defineExpose({
   formData,
   validate,
@@ -456,5 +452,9 @@ defineExpose({
 
 .rounded-borders {
   border-radius: 8px;
+}
+
+.q-radio {
+  margin-right: 8px;
 }
 </style>
