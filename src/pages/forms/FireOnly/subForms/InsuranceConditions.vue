@@ -16,7 +16,7 @@
             </div>
           </div>
         </div>
-        
+
         <div v-if="formData.previousInsurance === 'Yes'" class="col-12 col-md-6">
           <q-input v-model="formData.previousInsurer" label="Previous Insurer *" outlined
             placeholder="Name of previous insurance company" />
@@ -35,7 +35,7 @@
             </div>
           </div>
         </div>
-        
+
         <div v-if="formData.previousClaims === 'Yes'" class="col-12">
           <q-input v-model="formData.claimDetails" label="Claim Details *" outlined type="textarea" rows="3"
             placeholder="Describe previous claims, amounts, and dates" />
@@ -392,10 +392,10 @@ const resetForm = () => {
   formData.claimDetails = ''
   formData.standardExcessAmount = ''
   formData.additionalClauses = ''
-  
+
   selectedConditions.value = []
   cftSelectedConditions.value = []
-  
+
   autoConditions.index = props.hasIndexClause
   autoConditions.solarPanels = props.hasSolarPanels
   autoConditions.lossOfRent = props.hasLossOfRent

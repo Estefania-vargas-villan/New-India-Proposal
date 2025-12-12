@@ -31,62 +31,34 @@ export default defineConfig((ctx) => {
       'material-icons', // optional, you are not bound to it
     ],
 
-    build: {
+build: {
   target: {
     browser: ['es2022', 'firefox115', 'chrome115', 'safari14'],
     node: 'node20'
   },
-publicPath: '/New-India-Proposal/',
+  publicPath: '/',       // <--- así, para que carguen bien tus CSS y JS
+  vueRouterMode: 'hash', // mantiene las URLs con # para evitar 404
+  vitePlugins: [
+    [
+      '@intlify/unplugin-vue-i18n/vite',
+      {
+        ssr: ctx.modeName === 'ssr',
+        include: [fileURLToPath(new URL('./src/i18n', import.meta.url))],
+      },
+    ],
+    [
+      'vite-plugin-checker',
+      {
+        eslint: {
+          lintCommand: 'eslint -c ./eslint.config.js "./src*/**/*.{js,mjs,cjs,vue}"',
+          useFlatConfig: true,
+        },
+      },
+      { server: false },
+    ],
+  ],
+},
 
-      vueRouterMode: 'hash', // available values: 'hash', 'history'
-      // vueRouterBase,
-      // vueDevtools,
-      // vueOptionsAPI: false,
-
-      // rebuildCache: true, // rebuilds Vite/linter/etc cache on startup
-
-      // publicPath: '/',
-      // analyze: true,
-      // env: {},
-      // rawDefine: {}
-      // ignorePublicFolder: true,
-      // minify: false,
-      // polyfillModulePreload: true,
-      // distDir
-
-      // extendViteConf (viteConf) {},
-      // viteVuePluginOptions: {},
-
-      vitePlugins: [
-        [
-          '@intlify/unplugin-vue-i18n/vite',
-          {
-            // if you want to use Vue I18n Legacy API, you need to set `compositionOnly: false`
-            // compositionOnly: false,
-
-            // if you want to use named tokens in your Vue I18n messages, such as 'Hello {name}',
-            // you need to set `runtimeOnly: false`
-            // runtimeOnly: false,
-
-            ssr: ctx.modeName === 'ssr',
-
-            // you need to set i18n resource including paths !
-            include: [fileURLToPath(new URL('./src/i18n', import.meta.url))],
-          },
-        ],
-
-        [
-          'vite-plugin-checker',
-          {
-            eslint: {
-              lintCommand: 'eslint -c ./eslint.config.js "./src*/**/*.{js,mjs,cjs,vue}"',
-              useFlatConfig: true,
-            },
-          },
-          { server: false },
-        ],
-      ],
-    },
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#devserver
     devServer: {

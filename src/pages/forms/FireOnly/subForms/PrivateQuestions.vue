@@ -289,7 +289,6 @@ const formData = computed(() => ({
   contentsAmounts: { ...contentsAmounts },
   highRiskAmounts: { ...highRiskAmounts },
   valuablesAmounts: { ...valuablesAmounts },
-  totalSumInsured: totalSumInsured.value
 }))
 
 defineExpose({
